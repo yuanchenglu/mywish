@@ -33,14 +33,6 @@
     });
   }
   
-  async function handleRecommend(wish: Wish) {
-    await fetch('/api/recommend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wishId: wish.id })
-    });
-  }
-  
   function handleShare(wish: Wish) {
     const url = `${window.location.origin}/wish/${wish.key}`;
     if (navigator.share) {
@@ -76,7 +68,6 @@
         <WishCard 
           {wish}
           onLike={() => handleLike(wish)}
-          onRecommend={() => handleRecommend(wish)}
           onShare={() => handleShare(wish)}
         />
       {/each}

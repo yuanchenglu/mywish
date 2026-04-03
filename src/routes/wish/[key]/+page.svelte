@@ -35,15 +35,6 @@
     });
   }
   
-  async function handleRecommend() {
-    if (!wish) return;
-    await fetch('/api/recommend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wishId: wish.id })
-    });
-  }
-  
   function handleShare() {
     if (navigator.share) {
       navigator.share({
@@ -66,7 +57,7 @@
   {#if loading}
     <p>加载中...</p>
   {:else if wish}
-    <WishCard {wish} onLike={handleLike} onRecommend={handleRecommend} onShare={handleShare} />
+    <WishCard {wish} onLike={handleLike} onShare={handleShare} />
   {:else}
     <p>心愿不存在</p>
   {/if}
