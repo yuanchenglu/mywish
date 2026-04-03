@@ -7,16 +7,18 @@
   interface WishWithRealtime extends Wish {
     realtime_likes?: number;
     realtime_recommends?: number;
+    rank?: '状元' | '榜眼' | '探花';
   }
   
   interface Props {
     wish: WishWithRealtime;
+    variant?: 'default' | 'top3';
     onLike?: () => void;
     onRecommend?: () => void;
     onShare?: () => void;
   }
   
-  let { wish, onLike, onRecommend, onShare }: Props = $props();
+  let { wish, variant = 'default', onLike, onRecommend, onShare }: Props = $props();
   
   let showToast = $state(false);
   let toastMessage = $state('');
@@ -147,7 +149,19 @@
   }
 </script>
 
-<article class="wish-card" bind:this={cardElement}>
+<article class="wish-card {variant === 'top3' ? 'top3-card' : ''}" bind:this={cardElement}>
+  {#if wish.rank}
+    <div class="rank-badge {wish.rank === '状元' ? 'badge-gold' : wish.rank === '榜眼' ? 'badge-silver' : 'badge-bronze'}">
+      {#if wish.rank === '状元'}
+        🥇 状元
+      {:else if wish.rank === '榜眼'}
+        🥈 榜眼
+      {:else}
+        🥉 探花
+      {/if}
+    </div>
+  {/if}
+  
   <!-- 心愿文本 - 核心内容 -->
   <p class="wish-text">{wish.text}</p>
   
@@ -350,5 +364,69 @@
     .wish-actions {
       gap: 16px;
     }
+  }
+  
+  /* ========================================
+     Top3 大卡片专属样式
+     ======================================== */
+  
+  .top3-card {
+    padding: 28px 24px;
+    margin: 16px auto;
+    max-width: 500px;
+  }
+  
+  .top3-card .wish-text {
+    font-size: 20px;
+    min-height: 60px;
+  }
+  
+  .top3-card .wish-actions {
+    gap: 16px;
+  }
+  
+  .top3-card .action-btn {
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+  
+  /* ========================================
+     排名徽章样式
+     ======================================== */
+  
+  .rank-badge {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 8px 16px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    animation: badgeShine 2s ease-in-out infinite;
+  }
+  
+  .badge-gold {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 193, 7, 0.2));
+    color: #ffd700;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+  
+  .badge-silver {
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.3), rgba(169, 169, 169, 0.2));
+    color: #c0c0c0;
+    border: 1px solid rgba(192, 192, 192, 0.5);
+    box-shadow: 0 0 15px rgba(192, 192, 192, 0.2);
+  }
+  
+  .badge-bronze {
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.3), rgba(184, 115, 51, 0.2));
+    color: #cd7f32;
+    border: 1px solid rgba(205, 127, 50, 0.5);
+    box-shadow: 0 0 15px rgba(205, 127, 50, 0.2);
+  }
+  
+  @keyframes badgeShine {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
   }
 </style>
