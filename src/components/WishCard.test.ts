@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/svelte';
 import WishCard from './WishCard.svelte';
 import type { Wish } from '../../workers/lib/kv-schema';
@@ -15,6 +15,20 @@ describe('WishCard 组件', () => {
     hour_bucket: '2026-04-03T10'
   };
   
+  beforeEach(() => {
+    // Mock fetch API
+    global.fetch = vi.fn().mockResolvedValue({
+      json: () => Promise.resolve({
+        success: true,
+        data: { likes: 129, recommends: 46 }
+      })
+    }) as unknown as typeof fetch;
+    
+    // Mock clipboard
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+  });
+  
   it('应该正确渲染心愿文本', () => {
     const { getByText } = render(WishCard, { wish: mockWish });
     expect(getByText('愿家人平安健康，幸福美满')).toBeTruthy();
@@ -27,8 +41,8 @@ describe('WishCard 组件', () => {
   
   it('应该显示点赞数和推荐数', () => {
     const { getByText } = render(WishCard, { wish: mockWish });
-    expect(getByText('⭐ 128')).toBeTruthy();
-    expect(getByText('👍 45')).toBeTruthy();
+    expect(getByText('❤️ 128')).toBeTruthy();
+    expect(getByText('🌟 45')).toBeTruthy();
   });
   
   it('应该显示相对时间（刚刚）', () => {
@@ -43,8 +57,11 @@ describe('WishCard 组件', () => {
       onLike 
     });
     
-    const likeBtn = getByText('⭐ 128');
-    likeBtn.click();
+    const likeBtn = getByText('❤️ 128');
+    await likeBtn.click();
+    
+    // 等待异步操作完成
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     expect(onLike).toHaveBeenCalledOnce();
   });
@@ -56,21 +73,24 @@ describe('WishCard 组件', () => {
       onRecommend 
     });
     
-    const recommendBtn = getByText('👍 45');
-    recommendBtn.click();
+    const recommendBtn = getByText('🌟 45');
+    await recommendBtn.click();
+    
+    // 等待异步操作完成
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     expect(onRecommend).toHaveBeenCalledOnce();
   });
   
   it('应该复制小钥匙到剪贴板', async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, { clipboard: { writeText } });
-    
     const { getByText } = render(WishCard, { wish: mockWish });
     const keyBtn = getByText('🔑 xY9zKm');
-    keyBtn.click();
+    await keyBtn.click();
     
-    expect(writeText).toHaveBeenCalledWith('xY9zKm');
+    // 等待异步操作完成
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('xY9zKm');
   });
   
   it('应该显示历史时间的相对格式', () => {
@@ -93,6 +113,6 @@ describe('WishCard 组件', () => {
   
   it('应该包含分享按钮', () => {
     const { getByText } = render(WishCard, { wish: mockWish });
-    expect(getByText('📤 分享')).toBeTruthy();
+    expect(getByText('🔗 分享')).toBeTruthy();
   });
 });

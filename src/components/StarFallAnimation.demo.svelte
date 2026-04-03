@@ -1,14 +1,3 @@
-/**
- * @description StarFallAnimation 集成示例 - 展示如何在 WishCard 中使用点赞动画
- * @version 1.0
- * @created 2026-04-03
- * 
- * 集成方式：
- * 1. 在 WishCard 中导入 StarFallAnimation 组件
- * 2. 通过 bind:this 获取组件实例
- * 3. 在 onLike 回调中调用 animation.trigger()
- */
-
 <script lang="ts">
   import StarFallAnimation from './StarFallAnimation.svelte';
   import type { Wish } from '../../workers/lib/kv-schema';

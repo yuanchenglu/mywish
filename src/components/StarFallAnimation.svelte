@@ -1,16 +1,3 @@
-/**
- * @description 星星飘落动画组件 - 纯逻辑组件，无 DOM 元素
- * @version 1.0
- * @created 2026-04-03
- * @dependencies LikeAction.ts, BlessingVoice.ts
- * 
- * 功能特性：
- * - 导出 trigger() 函数供外部调用
- * - 可选祝福语音开关
- * - 集成 WishCard 的 onLike 回调
- * - Svelte 5 runes syntax
- */
-
 <script lang="ts">
   import { triggerLikeAnimation } from '../lib/LikeAction';
   import { BlessingVoice } from '../lib/audio/BlessingVoice';

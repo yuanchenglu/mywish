@@ -130,6 +130,22 @@
   --star-delay-base: 0s;
   --star-opacity: 0.8;
   --star-scale: 1;
+  
+  /* ========================================
+     图标系统 (Icon System)
+     ======================================== */
+  
+  /* 图标尺寸 */
+  --icon-size-xs: 16px;
+  --icon-size-sm: 20px;
+  --icon-size-base: 24px;
+  --icon-size-lg: 28px;
+  --icon-size-xl: 32px;
+  
+  /* 图标颜色 */
+  --icon-color-default: var(--color-text-muted);
+  --icon-color-active: var(--color-accent-gold);
+  --icon-color-primary: var(--color-secondary-400);
 }
 
 /* ========================================

@@ -1,19 +1,5 @@
-/**
- * @description 分享选项弹窗组件 - 底部弹出式设计（移动端友好）
- * @version 1.0
- * @created 2026-04-03
- * @dependencies tokens.css (设计系统), ShareAction.ts (分享逻辑)
- * 
- * 功能特性：
- * - 微博分享：跳转到微博分享页面
- * - 微信分享：显示链接，提示用户手动复制
- * - 链接复制：复制心愿链接到剪贴板
- * - 底部弹出动画（移动端友好）
- * - 点击遮罩层关闭
- * - 使用 Design Tokens（无硬编码样式）
- */
-
 <script lang="ts">
+  import Icon from '$lib/components/Icon.svelte';
   import {
     copyLinkToClipboard,
     shareToWeibo,
@@ -153,7 +139,7 @@
         onclick={handleWeiboShare}
         aria-label="分享到微博"
       >
-        <span class="share-icon">📱</span>
+        <span class="share-icon"><Icon name="at" size={24} /></span>
         <span class="share-label">微博分享</span>
       </button>
       
@@ -162,7 +148,7 @@
         onclick={handleWechatShare}
         aria-label="微信分享"
       >
-        <span class="share-icon">💬</span>
+        <span class="share-icon"><Icon name="message" size={24} /></span>
         <span class="share-label">微信分享</span>
       </button>
       
@@ -171,7 +157,7 @@
         onclick={handleCopyLink}
         aria-label="复制链接"
       >
-        <span class="share-icon">🔗</span>
+        <span class="share-icon"><Icon name="link" size={24} /></span>
         <span class="share-label">复制链接</span>
       </button>
     </div>

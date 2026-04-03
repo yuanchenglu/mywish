@@ -66,7 +66,7 @@
   {#if loading}
     <p>加载中...</p>
   {:else if wish}
-    <WishCard {wish} {handleLike} {handleRecommend} {handleShare} />
+    <WishCard {wish} onLike={handleLike} onRecommend={handleRecommend} onShare={handleShare} />
   {:else}
     <p>心愿不存在</p>
   {/if}

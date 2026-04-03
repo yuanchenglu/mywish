@@ -1,18 +1,5 @@
-/**
- * @description 发布心愿页面 - 心愿输入 + 小钥匙生成
- * @version 1.0
- * @created 2026-04-03
- * @dependencies WishCreator.ts (验证逻辑), tokens.css (设计系统)
- * 
- * 功能特性：
- * - 心愿输入框（textarea，最大100字）
- * - 实时字数统计（已输入 X/100）
- * - 小钥匙自动生成（6位 nanoid，可自定义）
- * - 发布按钮（输入验证通过后启用）
- * - 发布成功提示 + 跳转到心愿详情页（预留）
- */
-
 <script lang="ts">
+  import Icon from '$lib/components/Icon.svelte';
   import { 
     generateWishKey, 
     validateWishText, 
@@ -109,7 +96,7 @@
     <!-- 心愿输入区域 -->
     <section class="wish-input-section">
       <label for="wish-text" class="section-label">
-        💫 写下你的心愿
+        写下你的心愿
       </label>
       
       <textarea 
@@ -133,17 +120,17 @@
       
       <!-- 验证错误提示 -->
       {#if !textValidation.valid && wishText.length > 0}
-        <div class="validation-error" role="alert">
-          ⚠️ {textValidation.error}
-        </div>
+<div class="validation-error" role="alert">
+           {textValidation.error}
+         </div>
       {/if}
     </section>
     
     <!-- 小钥匙设置区域 -->
     <section class="wish-key-section">
-      <label for="wish-key" class="section-label">
-        🔑 心愿小钥匙（可选）
-      </label>
+<label for="wish-key" class="section-label">
+         心愿小钥匙（可选）
+       </label>
       
       <div class="key-input-group">
         <input 
@@ -165,8 +152,8 @@
           aria-label="重新生成小钥匙"
           title="重新生成小钥匙"
         >
-          🔄
-        </button>
+<Icon name="refresh" size={20} />
+         </button>
       </div>
       
       <!-- 小钥匙提示 -->
@@ -176,9 +163,9 @@
       
       <!-- 验证错误提示 -->
       {#if !keyValidation.valid && customKey.length > 0}
-        <div class="validation-error" role="alert">
-          ⚠️ {keyValidation.error}
-        </div>
+<div class="validation-error" role="alert">
+           {keyValidation.error}
+         </div>
       {/if}
     </section>
     
@@ -191,9 +178,9 @@
     >
       {#if isSubmitting}
         发布中...
-      {:else}
-        ✨ 发布心愿
-      {/if}
+{:else}
+         <Icon name="sparkles" size={20} /> 发布心愿
+       {/if}
     </button>
     
   </form>

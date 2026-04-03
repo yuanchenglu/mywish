@@ -1,20 +1,7 @@
-/**
- * @description 分享按钮组件 - 管理分享按钮 + 弹窗逻辑
- * @version 1.0
- * @created 2026-04-03
- * @dependencies tokens.css (设计系统), ShareModal.svelte (弹窗), ShareAction.ts (逻辑)
- * 
- * 功能特性：
- * - 点击按钮触发分享流程
- * - 优先使用 Web Share API（如果浏览器支持）
- * - Web Share API 不可用时弹出 ShareModal
- * - 可作为 WishCard 的 onShare 回调集成
- * - 使用 Design Tokens（无硬编码样式）
- */
-
 <script lang="ts">
   import ShareModal from './ShareModal.svelte';
   import { triggerShare, isWebShareSupported } from '../lib/ShareAction';
+  import Icon from '../lib/components/Icon.svelte';
   
   /**
    * 组件 Props 类型定义
@@ -71,7 +58,7 @@
   onclick={handleClick}
   aria-label="分享心愿"
 >
-  📤 {label}
+  <Icon name="share" size={20} /> {label}
 </button>
 
 {#if showModal}

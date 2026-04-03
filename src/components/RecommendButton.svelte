@@ -1,19 +1,6 @@
-/**
- * @description 推荐按钮组件 - 显示推荐计数和动画反馈
- * @version 1.0
- * @created 2026-04-03
- * @dependencies tokens.css (设计系统), RecommendAction.ts (推荐逻辑)
- * 
- * 功能特性：
- * - 显示推荐数（👍 + 计数）
- * - 点击触发推荐动画
- * - 禁用状态防止重复提交
- * - 推荐成功高亮反馈
- * - 响应式设计
- */
-
 <script lang="ts">
   import { triggerRecommend } from '../lib/RecommendAction';
+  import Icon from '../lib/components/Icon.svelte';
   
   /**
    * 组件 Props 类型定义
@@ -51,7 +38,7 @@
   aria-label="推荐"
   type="button"
 >
-  👍 {recommendCount}
+  <Icon name="star" size={20} /> {recommendCount}
 </button>
 
 <style>
