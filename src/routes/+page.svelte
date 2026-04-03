@@ -8,7 +8,7 @@
   
   interface WishWithRank extends Wish {
     realtime_likes?: number;
-    realtime_recommends?: number;
+    realtime_likes_increment?: number;
     rank?: '状元' | '榜眼' | '探花';
   }
   
@@ -99,15 +99,6 @@
     loadTop3();
   }
   
-  async function handleRecommend(wish: Wish | HourlyTopItem) {
-    await fetch('/api/recommend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wishKey: wish.key })
-    });
-    loadTop3();
-  }
-  
   function handleShare(wish: Wish | HourlyTopItem) {
     const url = `${window.location.origin}/wish/${wish.key}`;
     if (navigator.share) {
@@ -119,16 +110,16 @@
 </script>
 
 <svelte:head>
-  <title>瓦数Top3 - 星辰大海 My Wish</title>
-  <meta name="description" content="为光明添砖加瓦，愿星辰大海守护你" />
+  <title>星+Top3 - 星辰大海 My Wish</title>
+  <meta name="description" content="每小时星星增量排行，点亮最闪耀的心愿" />
 </svelte:head>
 
 <main class="page-content">
   {#if activeTab === 'like'}
-    <section class="tab-content" aria-label="瓦数Top3">
+    <section class="tab-content" aria-label="星+Top3">
       <header class="section-header">
-        <h1 class="section-title">瓦数Top3</h1>
-        <p class="section-desc">为光明添砖加瓦，点亮最闪耀的心愿</p>
+        <h1 class="section-title">星+Top3</h1>
+        <p class="section-desc">每小时星星增量排行，见证心愿闪耀时刻</p>
       </header>
       
       <div class="top3-list">
@@ -137,7 +128,7 @@
         {:else if top3Wishes.length === 0}
           <div class="empty-state">
             <p>暂无心愿上榜</p>
-            <p class="hint">快来许个心愿，让瓦数点亮它！</p>
+            <p class="hint">快来许个心愿，让星星点亮它！</p>
           </div>
         {:else}
           {#each top3Wishes as wish}
@@ -145,7 +136,6 @@
               wish={wish as WishWithRank}
               variant="top3"
               onLike={() => handleLike(wish)}
-              onRecommend={() => handleRecommend(wish)}
               onShare={() => handleShare(wish)}
             />
           {/each}
@@ -169,7 +159,6 @@
             <WishCard 
               {wish}
               onLike={() => handleLike(wish)}
-              onRecommend={() => handleRecommend(wish)}
               onShare={() => handleShare(wish)}
             />
           {/each}

@@ -3,7 +3,7 @@
  */
 
 import type { ErrorResponse } from '../../kv-schema';
-import { kvKey } from '../../kv-schema';
+import { kvKey, getCurrentHourBucket } from '../../kv-schema';
 
 interface Env {
   KV: KVNamespace;
@@ -48,16 +48,23 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
       wishId = mappedId;
     }
     
-    // FIX: KV.increment() 在 Pages Functions 中可能返回对象或不兼容
-    // 改用手动 get + put 方式确保兼容性
-    const currentLikes = await env.KV.get(kvKey.likes(wishId));
+    // 1. 更新总点赞数
+    const currentLikes = await env.KV.get(kvKey.likes(wishId!));
     const currentCount = currentLikes ? parseInt(currentLikes, 10) : 0;
     const newLikes = currentCount + 1;
-    await env.KV.put(kvKey.likes(wishId), String(newLikes));
+    await env.KV.put(kvKey.likes(wishId!), String(newLikes));
+    
+    // 2. 更新每小时增量
+    const hourBucket = getCurrentHourBucket();
+    const hourLikesKey = kvKey.likesHour(hourBucket, wishId!);
+    const currentHourLikes = await env.KV.get(hourLikesKey);
+    const hourCount = currentHourLikes ? parseInt(currentHourLikes, 10) : 0;
+    const newHourLikes = hourCount + 1;
+    await env.KV.put(hourLikesKey, String(newHourLikes));
     
     return new Response(JSON.stringify({
       success: true,
-      data: { wishId, likes: newLikes }
+      data: { wishId, likes: newLikes, hour_likes: newHourLikes }
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }

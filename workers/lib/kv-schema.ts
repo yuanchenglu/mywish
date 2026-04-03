@@ -89,8 +89,8 @@ export interface HourlyTopItem {
   key: string;
   /** 心愿内容 */
   text: string;
-  /** 该小时内的推荐数 */
-  recommends: number;
+  /** 该小时内的星星增量 */
+  likes_increment: number;
   /** 排名称号 */
   rank: '状元' | '榜眼' | '探花';
 }
@@ -151,6 +151,8 @@ export interface KVKeyBuilder {
   wish: (id: string) => string;
   /** 点赞计数器 Key: likes:{id} */
   likes: (id: string) => string;
+  /** 每小时点赞增量 Key: likes_hour:{hour}:{id} */
+  likesHour: (hour: string, id: string) => string;
   /** 推荐计数器 Key: recommends:{id} */
   recommends: (id: string) => string;
   /** 全局索引 Key: wishes:all */
@@ -279,6 +281,7 @@ export interface KVDataService {
 export const kvKey: KVKeyBuilder = {
   wish: (id: string) => `wish:${id}`,
   likes: (id: string) => `likes:${id}`,
+  likesHour: (hour: string, id: string) => `likes_hour:${hour}:${id}`,
   recommends: (id: string) => `recommends:${id}`,
   wishesAll: () => `wishes:all`,
   wishesHour: (timestamp: string) => `wishes:hour:${timestamp}`,

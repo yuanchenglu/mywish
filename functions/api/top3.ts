@@ -1,9 +1,10 @@
 /**
- * @description GET /api/top3 - 获取推荐数最高的3个心愿
+ * @description GET /api/top3 - 获取当前小时星星增量最高的3个心愿
+ * @version 2.0
  */
 
 import type { Wish, HourlyTopItem, Top3Response } from '../../kv-schema';
-import { kvKey, getRankTitle } from '../../kv-schema';
+import { kvKey, getRankTitle, getCurrentHourBucket } from '../../kv-schema';
 
 interface Env {
   KV: KVNamespace;
@@ -27,53 +28,47 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
   }
   
   try {
+    const currentHour = getCurrentHourBucket();
     const wishIds = await env.KV.get(kvKey.wishesAll(), 'json') as string[] | null;
     
     if (!wishIds || wishIds.length === 0) {
       return new Response(JSON.stringify({
         success: true,
-        data: {
-          top3: [],
-          hour: new Date().toISOString().slice(0, 13)
-        }
+        data: { top3: [], hour: currentHour }
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
     
-    const wishes = await Promise.all(
-      wishIds.map(id => env.KV.get(kvKey.wish(id), 'json') as Promise<Wish | null>)
-    );
-    
-    const wishesWithRecommends = await Promise.all(
-      wishes.filter(w => w !== null).map(async w => {
-        const recCount = await env.KV.get(kvKey.recommends(w.id));
-        return {
-          ...w,
-          realtime_recommends: parseInt(recCount || '0', 10)
-        };
+    const wishesWithIncrement = await Promise.all(
+      wishIds.map(async id => {
+        const wish = await env.KV.get(kvKey.wish(id), 'json') as Wish | null;
+        if (!wish) return null;
+        
+        const hourIncrement = await env.KV.get(kvKey.likesHour(currentHour, id));
+        const increment = parseInt(hourIncrement || '0', 10);
+        
+        return { ...wish, likes_increment: increment };
       })
     );
     
-    const sorted = wishesWithRecommends
-      .sort((a, b) => b.realtime_recommends - a.realtime_recommends)
+    const validWishes = wishesWithIncrement.filter(w => w !== null && w.likes_increment > 0) as Array<Wish & { likes_increment: number }>;
+    const sorted = validWishes
+      .sort((a, b) => b.likes_increment - a.likes_increment)
       .slice(0, 3);
     
     const top3: HourlyTopItem[] = sorted.map((w, index) => ({
       id: w.id,
       key: w.key,
       text: w.text,
-      recommends: w.realtime_recommends,
+      likes_increment: w.likes_increment,
       rank: getRankTitle(index + 1)
     }));
     
     return new Response(JSON.stringify({
       success: true,
-      data: {
-        top3,
-        hour: new Date().toISOString().slice(0, 13)
-      } as Top3Response
+      data: { top3, hour: currentHour } as Top3Response
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }

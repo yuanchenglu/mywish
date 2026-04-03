@@ -1,11 +1,11 @@
 /**
- * @description GET /api/top3 - 获取推荐数最高的3个心愿
- * @version 1.0
- * @created 2026-04-04
+ * @description GET /api/top3 - 获取当前小时星星增量最高的3个心愿
+ * @version 2.0
+ * @updated 2026-04-04
  */
 
 import type { Wish, WishResponse, HourlyTopItem, Top3Response } from '../lib/kv-schema';
-import { kvKey, getRankTitle } from '../lib/kv-schema';
+import { kvKey, getRankTitle, getCurrentHourBucket } from '../lib/kv-schema';
 
 interface Env {
   KV: KVNamespace;
@@ -30,6 +30,8 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
   }
   
   try {
+    const currentHour = getCurrentHourBucket();
+    
     // 1. 获取所有心愿 ID
     const wishIds = await env.KV.get(kvKey.wishesAll(), 'json') as string[] | null;
     
@@ -38,7 +40,7 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
         success: true,
         data: {
           top3: [],
-          hour: new Date().toISOString().slice(0, 13) // YYYY-MM-DDTHH
+          hour: currentHour
         }
       }), {
         status: 200,
@@ -46,42 +48,43 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
       });
     }
     
-    // 2. 批量获取心愿数据和推荐数
-    const wishes = await Promise.all(
-      wishIds.map(id => env.KV.get(kvKey.wish(id), 'json') as Promise<Wish | null>)
-    );
-    
-    // 3. 获取实时推荐数并排序
-    const wishesWithRecommends = await Promise.all(
-      wishes.filter(w => w !== null).map(async w => {
-        const recCount = await env.KV.get(kvKey.recommends(w.id));
+    // 2. 批量获取心愿数据和当前小时增量
+    const wishesWithIncrement = await Promise.all(
+      wishIds.map(async id => {
+        const wish = await env.KV.get(kvKey.wish(id), 'json') as Wish | null;
+        if (!wish) return null;
+        
+        const hourIncrement = await env.KV.get(kvKey.likesHour(currentHour, id));
+        const increment = parseInt(hourIncrement || '0', 10);
+        
         return {
-          ...w,
-          realtime_recommends: parseInt(recCount || '0', 10)
+          ...wish,
+          likes_increment: increment
         };
       })
     );
     
-    // 4. 按推荐数降序排序，取前3
-    const sorted = wishesWithRecommends
-      .sort((a, b) => b.realtime_recommends - a.realtime_recommends)
+    // 3. 过滤掉 null，按增量降序排序，取前3
+    const validWishes = wishesWithIncrement.filter(w => w !== null && w.likes_increment > 0) as Array<Wish & { likes_increment: number }>;
+    const sorted = validWishes
+      .sort((a, b) => b.likes_increment - a.likes_increment)
       .slice(0, 3);
     
-    // 5. 构建响应，添加排名徽章
+    // 4. 构建响应，添加排名徽章
     const top3: HourlyTopItem[] = sorted.map((w, index) => ({
-      id: w.id,
-      key: w.key,
-      text: w.text,
-      recommends: w.realtime_recommends,
-      rank: getRankTitle(index + 1) // 状元、榜眼、探花
+      id: w!.id,
+      key: w!.key,
+      text: w!.text,
+      likes_increment: w!.likes_increment,
+      rank: getRankTitle(index + 1)
     }));
     
-    // 6. 返回响应
+    // 5. 返回响应
     return new Response(JSON.stringify({
       success: true,
       data: {
         top3,
-        hour: new Date().toISOString().slice(0, 13)
+        hour: currentHour
       } as Top3Response
     }), {
       status: 200,
