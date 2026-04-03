@@ -1,0 +1,432 @@
+/**
+ * @description 响应式布局框架 - 移动端优先设计
+ * @version 1.0
+ * @created 2026-04-03
+ * @dependencies tokens.css (设计系统核心)
+ */
+
+/* ========================================
+   基础布局重置 - Layout Reset
+   ======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--color-bg-base);
+    color: var(--color-text-primary);
+    line-height: var(--line-height-normal);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ========================================
+   容器系统 - Container System
+   ======================================== */
+
+.container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 var(--spacing-4);
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+        padding: 0 var(--spacing-6);
+    }
+}
+
+@media (min-width: 1025px) {
+    .container {
+        max-width: 1200px;
+        padding: 0 var(--spacing-8);
+    }
+}
+
+/* ========================================
+   网格系统 - Grid System
+   ======================================== */
+
+.grid {
+    display: grid;
+    gap: var(--spacing-4);
+}
+
+.grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (min-width: 768px) {
+    .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .md\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .md\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (min-width: 1025px) {
+    .lg\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ========================================
+   Flexbox系统 - Flexbox System
+   ======================================== */
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.items-stretch { align-items: stretch; }
+
+.gap-1 { gap: var(--spacing-1); }
+.gap-2 { gap: var(--spacing-2); }
+.gap-3 { gap: var(--spacing-3); }
+.gap-4 { gap: var(--spacing-4); }
+.gap-6 { gap: var(--spacing-6); }
+.gap-8 { gap: var(--spacing-8); }
+
+/* ========================================
+   心愿卡片容器 - Wish Card Container
+   ======================================== */
+
+.card-container {
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    background: var(--color-bg-base);
+}
+
+.scroll-snap-container {
+    scroll-snap-type: y mandatory;
+}
+
+.scroll-snap-item {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+.wish-card-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-6);
+}
+
+.wish-content {
+    width: 100%;
+    max-width: 600px;
+    padding: var(--spacing-8);
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.wish-text {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--spacing-4);
+}
+
+.wish-placeholder {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+}
+
+/* ========================================
+   导航栏 - Navigation
+   ======================================== */
+
+/* 顶部导航栏 */
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--color-bg-dark);
+    border-bottom: 1px solid var(--color-border-default);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+}
+
+.top-nav .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-text {
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
+    color: var(--color-text-primary);
+}
+
+.nav-links {
+    display: flex;
+    gap: var(--spacing-4);
+}
+
+.nav-link {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-md);
+    transition: color var(--duration-fast);
+}
+
+.nav-link:hover {
+    color: var(--color-text-primary);
+}
+
+.search-icon,
+.hamburger {
+    background: none;
+    border: none;
+    color: var(--color-text-primary);
+    font-size: var(--text-xl);
+    cursor: pointer;
+    padding: var(--spacing-2);
+    border-radius: var(--radius-md);
+    transition: background var(--duration-fast);
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.search-icon:hover,
+.hamburger:hover {
+    background: var(--color-bg-card);
+}
+
+/* 底部导航（移动端） */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: var(--color-bg-dark);
+    border-top: 1px solid var(--color-border-default);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 var(--spacing-2);
+    z-index: 100;
+}
+
+.nav-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    padding: var(--spacing-2);
+    border-radius: var(--radius-md);
+    min-width: 44px;
+    min-height: 44px;
+    transition: color var(--duration-fast);
+}
+
+.nav-tab.active {
+    color: var(--color-accent-gold);
+}
+
+.nav-tab .tab-icon {
+    font-size: 24px;
+    margin-bottom: var(--spacing-1);
+}
+
+.nav-tab .tab-label {
+    font-size: var(--text-xs);
+}
+
+.publish-btn {
+    background: var(--color-accent-gold);
+    color: var(--color-text-inverse);
+    border: none;
+    border-radius: var(--radius-full);
+    padding: var(--spacing-3) var(--spacing-6);
+    cursor: pointer;
+}
+
+/* 侧边导航（桌面端） */
+.side-nav {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    background: var(--color-bg-dark);
+    border-right: 1px solid var(--color-border-default);
+    padding: var(--spacing-6);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+}
+
+.side-nav-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.side-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    margin-top: var(--spacing-8);
+}
+
+.side-nav-link {
+    display: block;
+    padding: var(--spacing-3) var(--spacing-4);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all var(--duration-fast);
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: var(--text-base);
+    min-height: 44px;
+}
+
+.side-nav-link.active,
+.side-nav-link:hover {
+    background: var(--color-bg-card);
+    color: var(--color-text-primary);
+}
+
+.side-nav-footer {
+    margin-top: auto;
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--color-border-default);
+}
+
+.side-nav-footer p {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+/* 主内容区域 */
+.main-content {
+    padding-top: 60px; /* 顶部导航高度 */
+    padding-bottom: 70px; /* 底部导航高度 */
+    min-height: 100vh;
+}
+
+@media (min-width: 1025px) {
+    .main-content {
+        margin-left: 280px; /* 侧边导航宽度 */
+        padding-bottom: 0;
+    }
+}
+
+/* ========================================
+   响应式工具类 - Responsive Utilities
+   ======================================== */
+
+.hidden-mobile {
+    display: none;
+}
+
+.hidden-desktop {
+    display: flex;
+}
+
+@media (min-width: 768px) {
+    .hidden-tablet {
+        display: none;
+    }
+    
+    .hidden-mobile {
+        display: flex;
+    }
+}
+
+@media (min-width: 1025px) {
+    .hidden-desktop {
+        display: none;
+    }
+    
+    .hidden-mobile {
+        display: flex;
+    }
+}
+
+/* ========================================
+   触摸目标优化 - Touch Target Optimization
+   ======================================== */
+
+button,
+a,
+.nav-link,
+.nav-tab,
+.side-nav-link {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* ========================================
+   动画基础 - Animation Base
+   ======================================== */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn var(--duration-normal) ease-out;
+}
+
+.animate-slide-up {
+    animation: slideUp var(--duration-normal) ease-out;
+}

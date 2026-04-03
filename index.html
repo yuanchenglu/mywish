@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="星辰大海心愿平台 - 发布你的小心愿，传递正能量，获得祝福">
+    <meta name="keywords" content="心愿平台,许愿网站,生日祝福网站,正能量祝福,星辰大海,袁昕宸,袁雪海">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="星辰大海 My Wish - 心愿祝福平台">
+    <meta property="og:description" content="发布你的小心愿，传递正能量，获得祝福">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mywish.starseas.org">
+    <meta property="og:site_name" content="星辰大海心愿平台">
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="星辰大海 My Wish - 心愿祝福平台">
+    <meta name="twitter:description" content="发布你的小心愿，传递正能量，获得祝福">
+    
+    <title>星辰大海 My Wish - 心愿祝福平台</title>
+    
+    <!-- 设计系统 -->
+    <link rel="stylesheet" href="src/styles/tokens.css">
+    <link rel="stylesheet" href="src/styles/layout.css">
+    
+    <!-- Schema.org 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "星辰大海 My Wish",
+        "url": "https://mywish.starseas.org",
+        "description": "发布你的小心愿，传递正能量，获得祝福",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://mywish.starseas.org/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="top-nav">
+        <div class="container">
+            <div class="nav-logo">
+                <span class="logo-text">🌟 星辰大海</span>
+            </div>
+            <nav class="nav-links hidden-mobile">
+                <a href="#home" class="nav-link">首页</a>
+                <a href="#about" class="nav-link">关于</a>
+            </nav>
+            <button class="search-icon" aria-label="搜索心愿">
+                🔍
+            </button>
+            <button class="hamburger hidden-desktop" aria-label="菜单">
+                ☰
+            </button>
+        </div>
+    </header>
+    
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 心愿卡片容器 -->
+        <div class="card-container scroll-snap-container">
+            <!-- 心愿卡片将在这里动态加载 -->
+            <div class="wish-card-wrapper scroll-snap-item">
+                <div class="wish-content">
+                    <p class="wish-text">欢迎来到星辰大海心愿平台</p>
+                    <p class="wish-placeholder">这里将显示心愿内容...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 底部导航（移动端） -->
+    <nav class="bottom-nav hidden-desktop">
+        <a href="#tab-popular" class="nav-tab active">
+            <span class="tab-icon">🏆</span>
+            <span class="tab-label">全民点赞</span>
+        </a>
+        <a href="#tab-square" class="nav-tab">
+            <span class="tab-icon">🌟</span>
+            <span class="tab-label">心愿广场</span>
+        </a>
+        <button class="nav-tab publish-btn">
+            <span class="tab-icon">✨</span>
+            <span class="tab-label">发布心愿</span>
+        </button>
+    </nav>
+    
+    <!-- 侧边导航（桌面端） -->
+    <aside class="side-nav hidden-mobile">
+        <div class="side-nav-content">
+            <div class="nav-logo">
+                <span class="logo-text">🌟 星辰大海</span>
+            </div>
+            <nav class="side-nav-links">
+                <a href="#tab-popular" class="side-nav-link active">🏆 全民点赞</a>
+                <a href="#tab-square" class="side-nav-link">🌟 心愿广场</a>
+                <button class="side-nav-link publish-btn">✨ 发布心愿</button>
+            </nav>
+            <div class="side-nav-footer">
+                <p>© 2026 星辰大海 My Wish</p>
+            </div>
+        </div>
+    </aside>
+    
+    <script>
+        // 基础交互脚本
+        console.log('星辰大海 My Wish 初始化完成');
+    </script>
+</body>
+</html>

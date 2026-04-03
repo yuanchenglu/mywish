@@ -1,0 +1,13 @@
+name = "mywish"
+compatibility_date = "2026-04-03"
+pages_build_output_dir = "dist"
+
+# KV namespace binding
+[[kv_namespaces]]
+binding = "KV"
+id = "ed6a9db909d24bbda3f430154ea264e2"
+
+# R2 bucket binding
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "mywish-static"

@@ -1,0 +1,234 @@
+/**
+ * 星辰大海设计系统 - Design Tokens
+ * @description 星空蓝/深空紫配色方案，科技感+温暖情绪
+ * @version 1.0.0
+ * @created 2026-04-03
+ */
+
+/* ========================================
+   颜色系统 (Color System)
+   ======================================== */
+
+:root {
+  /* 主色 - 深空紫 (Deep Space Purple) */
+  --color-primary-900: #1A1A2E;      /* 最深 */
+  --color-primary-800: #16213E;      /* 深紫 */
+  --color-primary-700: #0F3460;      /* 中紫 */
+  
+  /* 辅色 - 星空蓝 (Star Blue) */
+  --color-secondary-800: #0F4C75;    /* 深蓝 */
+  --color-secondary-600: #3282B8;    /* 中蓝 */
+  --color-secondary-400: #00B4DB;    /* 亮蓝 */
+  
+  /* 强调色 - 金色 (Gold Accent) */
+  --color-accent-gold: #FFD700;      /* 金色 - 状元 */
+  --color-accent-orange: #FFA500;    /* 橙金 - 榜眼探花 */
+  --color-accent-copper: #CD7F32;    /* 铜金 - 其他排名 */
+  
+  /* 背景色 - 深色渐变 (Dark Gradient) */
+  --color-bg-base: #0A0A0A;          /* 基础背景 */
+  --color-bg-dark: #1A1A2E;          /* 深色背景 */
+  --color-bg-card: #16213E;          /* 卡片背景 */
+  --color-bg-overlay: rgba(10, 10, 10, 0.95); /* 覆盖层 */
+  
+  /* 文字色 (Text Colors) */
+  --color-text-primary: #FFFFFF;     /* 主文字 */
+  --color-text-secondary: #E0E0E0;   /* 次文字 */
+  --color-text-muted: #B0B0B0;       /* 弱化文字 */
+  --color-text-inverse: #0A0A0A;     /* 反色文字 */
+  
+  /* 边框色 (Border Colors) */
+  --color-border-default: rgba(255, 255, 255, 0.1);
+  --color-border-light: rgba(255, 255, 255, 0.2);
+  --color-border-accent: rgba(0, 180, 219, 0.3);
+  
+  /* 状态色 (State Colors) */
+  --color-success: #00B4DB;
+  --color-warning: #FFA500;
+  --color-error: #FF6B6B;
+  --color-info: #3282B8;
+  
+  /* ========================================
+     字体系统 (Typography System)
+     ======================================== */
+  
+  /* 字体族 (Font Family) */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", 
+                      Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: "SF Mono", Monaco, "Cascadia Code", 
+                      "Roboto Mono", Consolas, monospace;
+  
+  /* 字号 (Font Size) */
+  --font-size-xs: 12px;    /* 标签、提示 */
+  --font-size-sm: 14px;    /* 正文小 */
+  --font-size-base: 16px;  /* 正文 */
+  --font-size-lg: 18px;    /* 大正文 */
+  --font-size-xl: 24px;    /* 标题 */
+  --font-size-2xl: 32px;   /* 大标题 */
+  
+  /* 字重 (Font Weight) */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  
+  /* 行高 (Line Height) */
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+  --line-height-loose: 1.75;
+  
+  /* ========================================
+     间距系统 (Spacing System)
+     基于 4px 单位
+     ======================================== */
+  
+  --space-1: 4px;   /* 极小间距 */
+  --space-2: 8px;   /* 小间距 */
+  --space-3: 12px;  /* 中小间距 */
+  --space-4: 16px;  /* 基础间距 */
+  --space-6: 24px;  /* 中间距 */
+  --space-8: 32px;  /* 大间距 */
+  --space-12: 48px; /* 极大间距 */
+  --space-16: 64px; /* 巨大间距 */
+  
+  /* ========================================
+     圆角系统 (Border Radius)
+     ======================================== */
+  
+  --radius-sm: 4px;   /* 小圆角 */
+  --radius-base: 8px; /* 基础圆角 */
+  --radius-lg: 16px;  /* 大圆角 */
+  --radius-full: 9999px; /* 全圆 */
+  
+  /* ========================================
+     阴影系统 (Shadow System)
+     ======================================== */
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-base: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(0, 180, 219, 0.3); /* 星光效果 */
+  
+  /* ========================================
+     动效系统 (Animation Tokens)
+     ======================================== */
+  
+  /* 过渡时间 */
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+  
+  /* 过渡曲线 */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* ========================================
+     星星动画参数
+     ======================================== */
+  
+  --star-duration: 3s;
+  --star-delay-base: 0s;
+  --star-opacity: 0.8;
+  --star-scale: 1;
+}
+
+/* ========================================
+   星星动画定义 (Star Animations)
+   ======================================== */
+
+/**
+ * @description 星星飘落动画 - 用于点赞、心愿达成等正向反馈
+ * @usage .star-fall { animation: star-fall var(--star-duration) ease-in-out infinite; }
+ */
+@keyframes star-fall {
+  0% {
+    opacity: var(--star-opacity);
+    transform: translateY(0) scale(var(--star-scale));
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(20px) scale(1.2);
+  }
+  100% {
+    opacity: 0.6;
+    transform: translateY(40px) scale(0.8);
+  }
+}
+
+/**
+ * @description 星星飞起动画 - 用于新愿望发布、排名提升等
+ * @usage .star-rise { animation: star-rise var(--star-duration) ease-in-out infinite; }
+ */
+@keyframes star-rise {
+  0% {
+    opacity: 0.6;
+    transform: translateY(40px) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(20px) scale(1.2);
+  }
+  100% {
+    opacity: var(--star-opacity);
+    transform: translateY(0) scale(var(--star-scale));
+  }
+}
+
+/**
+ * @description 星光闪烁动画 - 用于强调元素
+ * @usage .star-glow { animation: star-glow 2s ease-in-out infinite; }
+ */
+@keyframes star-glow {
+  0%, 100% {
+    opacity: 0.7;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.3);
+  }
+}
+
+/**
+ * @description 心愿卡片渐变背景
+ * @usage .wish-card { background: var(--gradient-card); }
+ */
+:root {
+  --gradient-bg: linear-gradient(180deg, 
+    var(--color-bg-base) 0%, 
+    var(--color-bg-dark) 100%);
+  
+  --gradient-card: linear-gradient(135deg, 
+    var(--color-primary-900) 0%, 
+    var(--color-primary-800) 50%, 
+    var(--color-primary-700) 100%);
+  
+  --gradient-accent: linear-gradient(90deg, 
+    var(--color-secondary-800) 0%, 
+    var(--color-secondary-600) 50%, 
+    var(--color-secondary-400) 100%);
+}
+
+/* ========================================
+   工具类 (Utility Classes)
+   ======================================== */
+
+/* 星星动画预设类 */
+.star-fall {
+  animation: star-fall var(--star-duration) var(--ease-in-out) infinite;
+}
+
+.star-rise {
+  animation: star-rise var(--star-duration) var(--ease-in-out) infinite;
+}
+
+.star-glow {
+  animation: star-glow 2s var(--ease-in-out) infinite;
+}
+
+/* 动画延迟辅助类 */
+.star-delay-1 { animation-delay: 0.2s; }
+.star-delay-2 { animation-delay: 0.5s; }
+.star-delay-3 { animation-delay: 0.8s; }
+.star-delay-4 { animation-delay: 1.1s; }
+.star-delay-5 { animation-delay: 1.4s; }
