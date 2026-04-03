@@ -153,7 +153,7 @@
       </div>
     </section>
   {:else if activeTab === 'square'}
-    <section class="tab-content" aria-label="星空广场">
+    <section class="tab-content" aria-label="许愿广场">
       <header class="section-header">
         <h1 class="section-title">漫步星空</h1>
         <p class="section-desc">查看所有心愿，传递祝福</p>

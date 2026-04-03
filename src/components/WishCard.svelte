@@ -26,6 +26,10 @@
   let currentRecommends = $state(wish.realtime_recommends || wish.recommends);
   let relativeTime = $derived(formatRelativeTime(wish.created_at));
   
+  // [FIX] 防止重复点击
+  let isLiking = $state(false);
+  let isRecommending = $state(false);
+  
   // [CRITICAL] DOM 引用用于触发动画
   let cardElement: HTMLElement | undefined;
   let recommendButton: HTMLButtonElement | undefined;
@@ -52,6 +56,9 @@
   }
   
   async function handleLikeClick() {
+    if (isLiking) return;
+    isLiking = true;
+    
     try {
       const res = await fetch('/api/like', {
         method: 'POST',
@@ -83,10 +90,15 @@
       }
     } catch (e) {
       console.error('点赞失败', e);
+    } finally {
+      isLiking = false;
     }
   }
   
   async function handleRecommendClick() {
+    if (isRecommending) return;
+    isRecommending = true;
+    
     try {
       const res = await fetch('/api/recommend', {
         method: 'POST',
@@ -115,6 +127,8 @@
       }
     } catch (e) {
       console.error('推荐失败', e);
+    } finally {
+      isRecommending = false;
     }
   }
   
@@ -167,12 +181,12 @@
   
   <!-- 操作按钮 -->
   <div class="wish-actions">
-    <button class="action-btn like-btn" onclick={handleLikeClick}>
+    <button class="action-btn like-btn" onclick={handleLikeClick} disabled={isLiking}>
       <Icon name="sparkles" size={16} class="btn-icon" />
       <span class="count {likesAnimating ? 'count-bounce' : ''}">{currentLikes}</span>
     </button>
     
-    <button class="action-btn recommend-btn" bind:this={recommendButton} onclick={handleRecommendClick}>
+    <button class="action-btn recommend-btn" bind:this={recommendButton} onclick={handleRecommendClick} disabled={isRecommending}>
       <Icon name="flame" size={16} class="btn-icon" />
       <span class="count {recommendsAnimating ? 'count-bounce' : ''}">{currentRecommends}</span>
     </button>

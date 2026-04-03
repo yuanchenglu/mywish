@@ -12,7 +12,7 @@
   const tabs: { id: TabType; label: string }[] = [
     { id: 'like', label: '瓦数Top3' },
     { id: 'publish', label: '许个心愿' },
-    { id: 'square', label: '星空广场' }
+    { id: 'square', label: '许愿广场' }
   ];
   
   function handleTabClick(tabId: TabType) {
@@ -29,7 +29,6 @@
     <button 
       class="nav-tab"
       class:active={activeTab === tab.id}
-      class:publish-tab={tab.id === 'publish'}
       onclick={() => handleTabClick(tab.id)}
       aria-current={activeTab === tab.id ? 'page' : undefined}
     >
@@ -70,11 +69,6 @@
   }
   
   .nav-tab.active {
-    color: var(--color-accent-gold);
-    font-weight: 600;
-  }
-  
-  .publish-tab {
     color: var(--color-accent-gold);
     font-weight: 600;
   }

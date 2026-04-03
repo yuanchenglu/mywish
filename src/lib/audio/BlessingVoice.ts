@@ -141,8 +141,14 @@ export class BlessingVoice {
       };
 
       utterance.onerror = (event) => {
-        console.error('[BlessingVoice] 播放失败:', event.error);
-        reject(event.error);
+        // [FIX] interrupted 是正常取消，不是错误
+        if (event.error === 'interrupted') {
+          console.log('[BlessingVoice] 语音被取消（正常行为）');
+          resolve();
+        } else {
+          console.error('[BlessingVoice] 播放失败:', event.error);
+          reject(event.error);
+        }
       };
 
       // [CRITICAL] 停止之前可能正在播放的语音
