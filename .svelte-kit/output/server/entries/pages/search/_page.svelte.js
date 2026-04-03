@@ -1,4 +1,5 @@
-import { e as escape_html, b as attr, d as derived, h as head, c as ensure_array_like } from "../../../chunks/index2.js";
+import { e as escape_html, b as attr_class, c as attr, d as derived, f as stringify, h as head, a as ensure_array_like } from "../../../chunks/index2.js";
+import { I as Icon } from "../../../chunks/Icon.js";
 /* empty css                                                     */
 import "@sveltejs/kit/internal";
 import "../../../chunks/exports.js";
@@ -9,6 +10,8 @@ import "../../../chunks/state.svelte.js";
 function WishCard($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     let { wish } = $$props;
+    let currentLikes = wish.realtime_likes || wish.likes;
+    let currentRecommends = wish.realtime_recommends || wish.recommends;
     let relativeTime = derived(() => formatRelativeTime(wish.created_at));
     function formatRelativeTime(dateString) {
       const date = new Date(dateString);
@@ -24,20 +27,15 @@ function WishCard($$renderer, $$props) {
       if (diffHours < 24 * 7) return `${Math.floor(diffHours / 24)}天前`;
       return date.toLocaleDateString("zh-CN");
     }
-    $$renderer2.push(`<!---->/**
- * @description 心愿卡片组件 - 展示单个心愿内容
- * @version 1.0
- * @created 2026-04-03
- * @dependencies tokens.css (设计系统), kv-schema.ts (Wish 类型)
- * 
- * 功能特性：
- * - 显示心愿文本（最大100字）
- * - 显示心愿小钥匙（6位，可点击复制）
- * - 显示点赞数和推荐数
- * - 显示创建时间（相对时间格式）
- * - 响应式设计（移动端全宽，桌面端居中）
- * - 星空蓝/深空紫主题
- */ <article class="wish-card svelte-khn1tn" aria-label="心愿卡片"><p class="wish-text svelte-khn1tn">${escape_html(wish.text)}</p> <button class="wish-key svelte-khn1tn" aria-label="点击复制小钥匙" title="点击复制小钥匙">🔑 ${escape_html(wish.key)}</button> <div class="wish-actions svelte-khn1tn"><button class="action-btn like-btn svelte-khn1tn" aria-label="点赞">⭐ ${escape_html(wish.likes)}</button> <button class="action-btn recommend-btn svelte-khn1tn" aria-label="推荐">👍 ${escape_html(wish.recommends)}</button> <button class="action-btn share-btn svelte-khn1tn" aria-label="分享">📤 分享</button></div> <time class="wish-time svelte-khn1tn"${attr("datetime", wish.created_at)}>${escape_html(relativeTime())}</time> `);
+    $$renderer2.push(`<article class="wish-card svelte-khn1tn"><p class="wish-text svelte-khn1tn">${escape_html(wish.text)}</p> <div class="wish-actions svelte-khn1tn"><button class="action-btn like-btn svelte-khn1tn">`);
+    Icon($$renderer2, { name: "sparkles", size: 16, class: "btn-icon" });
+    $$renderer2.push(`<!----> <span${attr_class(`count ${stringify("")}`, "svelte-khn1tn")}>${escape_html(currentLikes)}</span></button> <button class="action-btn recommend-btn svelte-khn1tn">`);
+    Icon($$renderer2, { name: "flame", size: 16, class: "btn-icon" });
+    $$renderer2.push(`<!----> <span${attr_class(`count ${stringify("")}`, "svelte-khn1tn")}>${escape_html(currentRecommends)}</span></button> <button class="action-btn share-btn svelte-khn1tn">`);
+    Icon($$renderer2, { name: "share", size: 16, class: "btn-icon" });
+    $$renderer2.push(`<!----> <span class="svelte-khn1tn">分享</span></button></div> <div class="wish-footer svelte-khn1tn"><button class="wish-key svelte-khn1tn" title="点击复制密钥">`);
+    Icon($$renderer2, { name: "key", size: 12, class: "key-icon" });
+    $$renderer2.push(`<!----> ${escape_html(wish.key)}</button> <time class="wish-time svelte-khn1tn"${attr("datetime", wish.created_at)}>${escape_html(relativeTime())}</time></div> `);
     {
       $$renderer2.push("<!--[-1-->");
     }

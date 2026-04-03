@@ -65,7 +65,6 @@ declare module '$env/static/private' {
 	export const npm_config_node_gyp: string;
 	export const PATH: string;
 	export const INVOCATION_ID: string;
-	export const OPENCODE_SERVER_PASSWORD: string;
 	export const NODE: string;
 	export const npm_package_name: string;
 	export const LANG: string;
@@ -199,7 +198,6 @@ declare module '$env/dynamic/private' {
 		npm_config_node_gyp: string;
 		PATH: string;
 		INVOCATION_ID: string;
-		OPENCODE_SERVER_PASSWORD: string;
 		NODE: string;
 		npm_package_name: string;
 		LANG: string;

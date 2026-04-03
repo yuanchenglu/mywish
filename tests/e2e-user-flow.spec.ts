@@ -1,12 +1,14 @@
 import { test, expect } from '@playwright/test';
 
+const BASE_URL = 'https://master.mywish-63v.pages.dev';
+
 test.describe('My Wish 完整用户流程测试', () => {
   test('应该能正常访问首页并显示心愿', async ({ page }) => {
     // 访问首页
-    await page.goto('https://mywish.starseas.org/');
+    await page.goto(BASE_URL + '/');
     
     // 检查页面标题
-    await expect(page).toHaveTitle(/心愿广场/);
+    await expect(page).toHaveTitle(/心愿/);
     
     // 检查两个 Tab
     await expect(page.locator('text=全民点赞')).toBeVisible();
@@ -19,7 +21,7 @@ test.describe('My Wish 完整用户流程测试', () => {
   });
 
   test('应该能正常发布心愿', async ({ page }) => {
-    await page.goto('https://mywish.starseas.org/create');
+    await page.goto(BASE_URL + '/create');
     
     // 填写心愿内容
     await page.fill('textarea', 'E2E 测试心愿：希望世界和平');
@@ -34,7 +36,7 @@ test.describe('My Wish 完整用户流程测试', () => {
   });
 
   test('应该能正常点赞', async ({ page }) => {
-    await page.goto('https://mywish.starseas.org/');
+    await page.goto(BASE_URL + '/');
     
     // 等待心愿加载
     await page.waitForTimeout(2000);

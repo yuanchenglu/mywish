@@ -154,12 +154,12 @@
   <!-- 操作按钮 -->
   <div class="wish-actions">
     <button class="action-btn like-btn" onclick={handleLikeClick}>
-      <Icon name="heart" size={16} class="btn-icon" />
+      <Icon name="sparkles" size={16} class="btn-icon" />
       <span class="count {likesAnimating ? 'count-bounce' : ''}">{currentLikes}</span>
     </button>
     
     <button class="action-btn recommend-btn" bind:this={recommendButton} onclick={handleRecommendClick}>
-      <Icon name="star" size={16} class="btn-icon" />
+      <Icon name="flame" size={16} class="btn-icon" />
       <span class="count {recommendsAnimating ? 'count-bounce' : ''}">{currentRecommends}</span>
     </button>
     

@@ -27,6 +27,15 @@ function deferred() {
   });
   return { promise, resolve, reject };
 }
+function fallback(value, fallback2, lazy = false) {
+  return value === void 0 ? lazy ? (
+    /** @type {() => V} */
+    fallback2()
+  ) : (
+    /** @type {V} */
+    fallback2
+  ) : value;
+}
 const DERIVED = 1 << 1;
 const EFFECT = 1 << 2;
 const RENDER_EFFECT = 1 << 3;
@@ -73,6 +82,27 @@ const ELEMENT_IS_NAMESPACED = 1;
 const ELEMENT_PRESERVE_ATTRIBUTE_CASE = 1 << 1;
 const ELEMENT_IS_INPUT = 1 << 2;
 const UNINITIALIZED = Symbol();
+const VOID_ELEMENT_NAMES = [
+  "area",
+  "base",
+  "br",
+  "col",
+  "command",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "keygen",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr"
+];
+function is_void(name) {
+  return VOID_ELEMENT_NAMES.includes(name) || name.toLowerCase() === "!doctype";
+}
 const DOM_BOOLEAN_ATTRIBUTES = [
   "allowfullscreen",
   "async",
@@ -110,6 +140,17 @@ const PASSIVE_EVENTS = ["touchstart", "touchmove"];
 function is_passive_event(name) {
   return PASSIVE_EVENTS.includes(name);
 }
+const RAW_TEXT_ELEMENTS = (
+  /** @type {const} */
+  ["textarea", "script", "style", "title"]
+);
+function is_raw_text_element(name) {
+  return RAW_TEXT_ELEMENTS.includes(
+    /** @type {typeof RAW_TEXT_ELEMENTS[number]} */
+    name
+  );
+}
+const REGEX_VALID_TAG_NAME = /^[a-zA-Z][a-zA-Z0-9]*(-[a-zA-Z0-9.\-_\u00B7\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u037D\u037F-\u1FFF\u200C-\u200D\u203F-\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u{10000}-\u{EFFFF}]+)*$/u;
 const ATTR_REGEX = /[&"<]/g;
 const CONTENT_REGEX = /[&<]/g;
 function escape_html(value, is_attr) {
@@ -279,6 +320,13 @@ function await_invalid() {
   const error = new Error(`await_invalid
 Encountered asynchronous work while rendering synchronously.
 https://svelte.dev/e/await_invalid`);
+  error.name = "Svelte error";
+  throw error;
+}
+function dynamic_element_invalid_tag(tag) {
+  const error = new Error(`dynamic_element_invalid_tag
+\`<svelte:element this="${tag}">\` is not a valid element name — the element will not be rendered
+https://svelte.dev/e/dynamic_element_invalid_tag`);
   error.name = "Svelte error";
   throw error;
 }
@@ -1112,6 +1160,25 @@ class SSRState {
   }
 }
 const INVALID_ATTR_NAME_CHAR_REGEX = /[\s'">/=\u{FDD0}-\u{FDEF}\u{FFFE}\u{FFFF}\u{1FFFE}\u{1FFFF}\u{2FFFE}\u{2FFFF}\u{3FFFE}\u{3FFFF}\u{4FFFE}\u{4FFFF}\u{5FFFE}\u{5FFFF}\u{6FFFE}\u{6FFFF}\u{7FFFE}\u{7FFFF}\u{8FFFE}\u{8FFFF}\u{9FFFE}\u{9FFFF}\u{AFFFE}\u{AFFFF}\u{BFFFE}\u{BFFFF}\u{CFFFE}\u{CFFFF}\u{DFFFE}\u{DFFFF}\u{EFFFE}\u{EFFFF}\u{FFFFE}\u{FFFFF}\u{10FFFE}\u{10FFFF}]/u;
+function element(renderer, tag, attributes_fn = noop, children_fn = noop) {
+  renderer.push("<!---->");
+  if (tag) {
+    if (!REGEX_VALID_TAG_NAME.test(tag)) {
+      dynamic_element_invalid_tag(tag);
+    }
+    renderer.push(`<${tag}`);
+    attributes_fn();
+    renderer.push(`>`);
+    if (!is_void(tag)) {
+      children_fn();
+      if (!is_raw_text_element(tag)) {
+        renderer.push(EMPTY_COMMENT);
+      }
+      renderer.push(`</${tag}>`);
+    }
+  }
+  renderer.push("<!---->");
+}
 function render(component, options = {}) {
   if (options.csp?.hash && options.csp.nonce) {
     invalid_csp();
@@ -1162,6 +1229,26 @@ function attributes(attrs, css_hash, classes, styles, flags = 0) {
   }
   return attr_str;
 }
+function spread_props(props) {
+  const merged_props = {};
+  let key;
+  for (let i = 0; i < props.length; i++) {
+    const obj = props[i];
+    if (obj == null) continue;
+    for (key of Object.keys(obj)) {
+      const desc = Object.getOwnPropertyDescriptor(obj, key);
+      if (desc) {
+        Object.defineProperty(merged_props, key, desc);
+      } else {
+        merged_props[key] = obj[key];
+      }
+    }
+  }
+  return merged_props;
+}
+function stringify(value) {
+  return typeof value === "string" ? value : value == null ? "" : value + "";
+}
 function attr_class(value, hash, directives) {
   var result = to_class(value, hash, directives);
   return result ? ` class="${escape_html(result, true)}"` : "";
@@ -1173,6 +1260,29 @@ function slot(renderer, $$props, name, slot_props, fallback_fn) {
   }
   if (slot_fn !== void 0) {
     slot_fn(renderer, slot_props);
+  }
+}
+function rest_props(props, rest) {
+  const rest_props2 = {};
+  let key;
+  for (key of Object.keys(props)) {
+    if (!rest.includes(key)) {
+      rest_props2[key] = props[key];
+    }
+  }
+  return rest_props2;
+}
+function sanitize_props(props) {
+  const { children, $$slots, ...sanitized } = props;
+  return sanitized;
+}
+function bind_props(props_parent, props_now) {
+  for (const key of Object.keys(props_now)) {
+    const initial_value = props_parent[key];
+    const value = props_now[key];
+    if (initial_value === void 0 && value !== void 0 && Object.getOwnPropertyDescriptor(props_parent, key)?.set) {
+      props_parent[key] = value;
+    }
   }
 }
 function ensure_array_like(array_like_or_iterator) {
@@ -1205,63 +1315,72 @@ function derived(fn) {
   };
 }
 export {
-  define_property as $,
-  ASYNC as A,
+  get_descriptor as $,
+  BLOCK_EFFECT as A,
   BOUNDARY_EFFECT as B,
   COMMENT_NODE as C,
   DIRTY as D,
   ERROR_VALUE as E,
-  HYDRATION_START_FAILED as F,
-  EFFECT_TRANSPARENT as G,
+  DESTROYED as F,
+  EAGER_EFFECT as G,
   HYDRATION_ERROR as H,
   INERT as I,
-  EFFECT_PRESERVED as J,
-  STATE_SYMBOL as K,
-  object_prototype as L,
+  ASYNC as J,
+  deferred as K,
+  RENDER_EFFECT as L,
   MAYBE_DIRTY as M,
-  array_prototype as N,
-  get_descriptor as O,
-  get_prototype_of as P,
-  is_array as Q,
+  MANAGED_EFFECT as N,
+  ROOT_EFFECT as O,
+  BRANCH_EFFECT as P,
+  includes as Q,
   REACTION_RAN as R,
-  STALE_REACTION as S,
-  is_extensible as T,
+  HYDRATION_START_FAILED as S,
+  EFFECT_TRANSPARENT as T,
   UNINITIALIZED as U,
-  HEAD_EFFECT as V,
+  EFFECT_PRESERVED as V,
   WAS_MARKED as W,
-  DESTROYING as X,
-  USER_EFFECT as Y,
-  REACTION_IS_UPDATING as Z,
-  index_of as _,
-  attr_class as a,
-  array_from as a0,
-  is_passive_event as a1,
-  LEGACY_PROPS as a2,
-  render as a3,
-  setContext as a4,
-  attr as b,
-  ensure_array_like as c,
+  STALE_REACTION as X,
+  STATE_SYMBOL as Y,
+  object_prototype as Z,
+  array_prototype as _,
+  ensure_array_like as a,
+  get_prototype_of as a0,
+  is_array as a1,
+  is_extensible as a2,
+  HEAD_EFFECT as a3,
+  DESTROYING as a4,
+  USER_EFFECT as a5,
+  REACTION_IS_UPDATING as a6,
+  index_of as a7,
+  define_property as a8,
+  array_from as a9,
+  is_passive_event as aa,
+  LEGACY_PROPS as ab,
+  render as ac,
+  setContext as ad,
+  attr_class as b,
+  attr as c,
   derived as d,
   escape_html as e,
-  HYDRATION_END as f,
+  stringify as f,
   getContext as g,
   head as h,
-  HYDRATION_START as i,
-  HYDRATION_START_ELSE as j,
-  EFFECT as k,
-  CONNECTED as l,
-  CLEAN as m,
+  sanitize_props as i,
+  fallback as j,
+  attributes as k,
+  clsx as l,
+  element as m,
   noop as n,
-  DERIVED as o,
-  BLOCK_EFFECT as p,
-  DESTROYED as q,
-  run_all as r,
+  bind_props as o,
+  spread_props as p,
+  HYDRATION_END as q,
+  rest_props as r,
   slot as s,
-  EAGER_EFFECT as t,
-  deferred as u,
-  RENDER_EFFECT as v,
-  MANAGED_EFFECT as w,
-  ROOT_EFFECT as x,
-  BRANCH_EFFECT as y,
-  includes as z
+  HYDRATION_START as t,
+  HYDRATION_START_ELSE as u,
+  run_all as v,
+  EFFECT as w,
+  CONNECTED as x,
+  CLEAN as y,
+  DERIVED as z
 };

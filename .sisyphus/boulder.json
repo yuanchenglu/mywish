@@ -1,0 +1,16 @@
+{
+  "active_plan": "/home/bluth/Code/mywish/.sisyphus/plans/product-upgrade-2026-04-04.md",
+  "started_at": "2026-04-03T18:28:19.875Z",
+  "session_ids": [
+    "ses_2ab85c91efferhZe9rwPX9H510",
+    "ses_2ab648235ffeieGQWVweJ6yya4",
+    "ses_2ab64821affeWsH2MeBpHsSMh4",
+    "ses_2ab5faa4fffe2tLNfJFY8EBH1L",
+    "ses_2ab5faa21ffe6YZUPQiSqlG5gs",
+    "ses_2ab5faa44ffen6S7TGenxdg9Jy",
+    "ses_2ab55e128ffeSF6aigv8ROOnDj"
+  ],
+  "plan_name": "product-upgrade-2026-04-04",
+  "agent": "atlas",
+  "task_sessions": {}
+}

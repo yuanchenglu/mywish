@@ -1,4 +1,5 @@
-import { h as head, b as attr, e as escape_html, a as attr_class, d as derived } from "../../../chunks/index2.js";
+import { h as head, c as attr, e as escape_html, b as attr_class, d as derived } from "../../../chunks/index2.js";
+import { I as Icon } from "../../../chunks/Icon.js";
 import { customAlphabet } from "nanoid";
 const ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 function generateWishKey() {
@@ -46,19 +47,7 @@ function _page($$renderer, $$props) {
         $$renderer4.push(`<title>发布心愿 - 星辰大海 My Wish</title>`);
       });
     });
-    $$renderer2.push(`<!---->/**
- * @description 发布心愿页面 - 心愿输入 + 小钥匙生成
- * @version 1.0
- * @created 2026-04-03
- * @dependencies WishCreator.ts (验证逻辑), tokens.css (设计系统)
- * 
- * 功能特性：
- * - 心愿输入框（textarea，最大100字）
- * - 实时字数统计（已输入 X/100）
- * - 小钥匙自动生成（6位 nanoid，可自定义）
- * - 发布按钮（输入验证通过后启用）
- * - 发布成功提示 + 跳转到心愿详情页（预留）
- */  <main class="create-page svelte-jztt4t"><form class="wish-form svelte-jztt4t"><section class="wish-input-section svelte-jztt4t"><label for="wish-text" class="section-label svelte-jztt4t">💫 写下你的心愿</label> <textarea id="wish-text" class="wish-textarea svelte-jztt4t"${attr("maxlength", maxChars)} placeholder="愿家人平安健康，幸福美满..." aria-describedby="char-count"${attr("aria-invalid", !textValidation().valid)}>`);
+    $$renderer2.push(`<main class="create-page svelte-jztt4t"><form class="wish-form svelte-jztt4t"><section class="wish-input-section svelte-jztt4t"><label for="wish-text" class="section-label svelte-jztt4t">写下你的心愿</label> <textarea id="wish-text" class="wish-textarea svelte-jztt4t"${attr("maxlength", maxChars)} placeholder="愿家人平安健康，幸福美满..." aria-describedby="char-count"${attr("aria-invalid", !textValidation().valid)}>`);
     const $$body = escape_html(wishText);
     if ($$body) {
       $$renderer2.push(`${$$body}`);
@@ -66,21 +55,24 @@ function _page($$renderer, $$props) {
     $$renderer2.push(`</textarea> <div id="char-count"${attr_class("char-count svelte-jztt4t", void 0, { "over-limit": charCount() > maxChars })}>已输入 ${escape_html(charCount())}/100 字</div> `);
     if (!textValidation().valid && wishText.length > 0) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="validation-error svelte-jztt4t" role="alert">⚠️ ${escape_html(textValidation().error)}</div>`);
+      $$renderer2.push(`<div class="validation-error svelte-jztt4t" role="alert">${escape_html(textValidation().error)}</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></section> <section class="wish-key-section svelte-jztt4t"><label for="wish-key" class="section-label svelte-jztt4t">🔑 心愿小钥匙（可选）</label> <div class="key-input-group svelte-jztt4t"><input id="wish-key" type="text" class="key-input svelte-jztt4t"${attr("value", customKey)}${attr("maxlength", 6)} placeholder="自定义6位小钥匙" aria-describedby="key-hint"${attr("aria-invalid", !keyValidation().valid)}/> <button type="button" class="regenerate-btn svelte-jztt4t" aria-label="重新生成小钥匙" title="重新生成小钥匙">🔄</button></div> <div id="key-hint" class="key-hint svelte-jztt4t">当前小钥匙：<span class="key-preview svelte-jztt4t">${escape_html(generatedKey())}</span></div> `);
+    $$renderer2.push(`<!--]--></section> <section class="wish-key-section svelte-jztt4t"><label for="wish-key" class="section-label svelte-jztt4t">心愿小钥匙（可选）</label> <div class="key-input-group svelte-jztt4t"><input id="wish-key" type="text" class="key-input svelte-jztt4t"${attr("value", customKey)}${attr("maxlength", 6)} placeholder="自定义6位小钥匙" aria-describedby="key-hint"${attr("aria-invalid", !keyValidation().valid)}/> <button type="button" class="regenerate-btn svelte-jztt4t" aria-label="重新生成小钥匙" title="重新生成小钥匙">`);
+    Icon($$renderer2, { name: "refresh", size: 20 });
+    $$renderer2.push(`<!----></button></div> <div id="key-hint" class="key-hint svelte-jztt4t">当前小钥匙：<span class="key-preview svelte-jztt4t">${escape_html(generatedKey())}</span></div> `);
     if (!keyValidation().valid && customKey.length > 0) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="validation-error svelte-jztt4t" role="alert">⚠️ ${escape_html(keyValidation().error)}</div>`);
+      $$renderer2.push(`<div class="validation-error svelte-jztt4t" role="alert">${escape_html(keyValidation().error)}</div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--></section> <button type="submit" class="submit-btn svelte-jztt4t"${attr("disabled", !isValid() || isSubmitting, true)}${attr("aria-busy", isSubmitting)}>`);
     {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`✨ 发布心愿`);
+      Icon($$renderer2, { name: "sparkles", size: 20 });
+      $$renderer2.push(`<!----> 发布心愿`);
     }
     $$renderer2.push(`<!--]--></button></form> `);
     {

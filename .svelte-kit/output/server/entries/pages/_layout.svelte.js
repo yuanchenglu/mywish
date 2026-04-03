@@ -4,11 +4,11 @@ function _layout($$renderer, $$props) {
     $$renderer2.title(($$renderer3) => {
       $$renderer3.push(`<title>星辰大海 My Wish - 心愿祝福平台</title>`);
     });
-    $$renderer2.push(`<meta name="description" content="发布你的小心愿，传递正能量，获得祝福"/>`);
+    $$renderer2.push(`<meta name="description" content="发布你的小心愿，传递正能量，获得祝福"/> <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>`);
   });
-  $$renderer.push(`<!--[-->`);
+  $$renderer.push(`<div class="app-container svelte-12qhfyh"><!--[-->`);
   slot($$renderer, $$props, "default", {});
-  $$renderer.push(`<!--]-->`);
+  $$renderer.push(`<!--]--></div>`);
 }
 export {
   _layout as default

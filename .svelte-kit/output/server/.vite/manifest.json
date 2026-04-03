@@ -10,8 +10,15 @@
       "_internal.js"
     ]
   },
+  "_Icon.js": {
+    "file": "chunks/Icon.js",
+    "name": "Icon",
+    "imports": [
+      "_index2.js"
+    ]
+  },
   "_WishCard.svelte_svelte_type_style_lang.js": {
-    "file": "_app/immutable/assets/WishCard.BNxe0dsT.css",
+    "file": "_app/immutable/assets/WishCard.CFHjzURo.css",
     "src": "_WishCard.svelte_svelte_type_style_lang.js"
   },
   "_environment.js": {
@@ -123,7 +130,7 @@
       "_index2.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.BhPKNOlv.css"
+      "_app/immutable/assets/_layout.BGzlPKqy.css"
     ]
   },
   "src/routes/+page.svelte": {
@@ -135,8 +142,8 @@
       "_index2.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.C6HdoQp1.css",
-      "_app/immutable/assets/WishCard.BNxe0dsT.css"
+      "_app/immutable/assets/_page.DmCL9S-S.css",
+      "_app/immutable/assets/WishCard.CFHjzURo.css"
     ]
   },
   "src/routes/create/+page.svelte": {
@@ -145,7 +152,8 @@
     "src": "src/routes/create/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_index2.js"
+      "_index2.js",
+      "_Icon.js"
     ],
     "css": [
       "_app/immutable/assets/_page.B9wlhfcf.css"
@@ -158,6 +166,7 @@
     "isEntry": true,
     "imports": [
       "_index2.js",
+      "_Icon.js",
       "_exports.js",
       "_utils.js",
       "_root.js",
@@ -165,7 +174,7 @@
     ],
     "css": [
       "_app/immutable/assets/_page.D7AfhPTH.css",
-      "_app/immutable/assets/WishCard.BNxe0dsT.css"
+      "_app/immutable/assets/WishCard.CFHjzURo.css"
     ]
   },
   "src/routes/wish/[key]/+page.svelte": {
@@ -181,7 +190,7 @@
       "_state.svelte.js"
     ],
     "css": [
-      "_app/immutable/assets/WishCard.BNxe0dsT.css"
+      "_app/immutable/assets/WishCard.CFHjzURo.css"
     ]
   }
 }
