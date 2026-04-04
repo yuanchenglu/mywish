@@ -188,9 +188,9 @@ async function writeWishToKV(env: Env, wish: Wish): Promise<void> {
     env.KV.put(kvKey.key(wish.key), wish.id)
   ];
   
-  // 5. 追加到全局索引（需要读取现有列表）
+  // 5. 插入到全局索引开头（最新心愿在最前面）
   const existingIds = await env.KV.get(kvKey.wishesAll(), 'json') as string[] | null;
-  const updatedIds = existingIds ? [...existingIds, wish.id] : [wish.id];
+  const updatedIds = existingIds ? [wish.id, ...existingIds] : [wish.id];
   operations.push(env.KV.put(kvKey.wishesAll(), JSON.stringify(updatedIds)));
   
   // [CRITICAL] 并行执行所有写入操作
