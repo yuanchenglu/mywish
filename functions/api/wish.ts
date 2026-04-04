@@ -19,6 +19,7 @@
 import { customAlphabet } from 'nanoid';
 import type { Wish, CreateWishInput, ErrorResponse } from '../../kv-schema';
 import { kvKey, getCurrentHourBucket } from '../../kv-schema';
+import { checkPositiveEnergy } from '../lib/positive-energy-check';
 
 // [CRITICAL] 自定义 alphabet：仅字母和数字（不含特殊字符）
 const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -31,8 +32,8 @@ const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
  * Worker 环境变量
  */
 interface Env {
-  /** KV namespace binding */
   KV: KVNamespace;
+  BAILIAN_API_KEY: string;
 }
 
 // ============================================================================
@@ -233,6 +234,14 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
     const textValidation = validateWishText(body.text);
     if (!textValidation.valid) {
       return buildErrorResponse(400, 'INVALID_TEXT', textValidation.error!);
+    }
+    
+    // Step 2.5: AI 正能量检测
+    const sanitizedTextForCheck = sanitizeWishText(body.text);
+    const energyCheck = await checkPositiveEnergy(env.BAILIAN_API_KEY, sanitizedTextForCheck);
+    if (!energyCheck.positive) {
+      return buildErrorResponse(400, 'NEGATIVE_CONTENT', 
+        '此小心愿负面能量大于正面能量，无法发布，为维护社区氛围，只有正能量的小心愿才能发布。望理解！');
     }
     
     // Step 3: 处理小钥匙

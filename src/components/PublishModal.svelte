@@ -41,6 +41,7 @@
   
   // 提交状态
   let isSubmitting = $state(false);
+  let isCheckingEnergy = $state(false);
   
   // Modal动画状态
   let isVisible = $state(false);
@@ -56,6 +57,7 @@
     if (!isValid || isSubmitting) return;
     
     isSubmitting = true;
+    isCheckingEnergy = true;
     
     try {
       const result = prepareWishInput(wishText, customKey);
@@ -65,15 +67,18 @@
         toastMessage = result.error || '发布失败';
         toastType = 'error';
         setTimeout(() => { showToast = false; }, 3000);
+        isCheckingEnergy = false;
         return;
       }
       
-      // 调用API发布心愿
+      // 调用API发布心愿（后端会执行正能量检测）
       const res = await fetch('/api/wish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(result.data)
       });
+      
+      isCheckingEnergy = false;
       
       const json = await res.json();
       
@@ -93,7 +98,7 @@
         customKey = '';
       } else {
         showToast = true;
-        toastMessage = json.error || '发布失败，请重试';
+        toastMessage = json.message || json.error || '发布失败，请重试';
         toastType = 'error';
         setTimeout(() => { showToast = false; }, 3000);
       }
@@ -218,7 +223,14 @@
         class="submit-btn"
         disabled={!isValid || isSubmitting}
       >
-        {#if isSubmitting}
+        {#if isCheckingEnergy}
+          <div class="energy-check-animation">
+            <span class="star-icon">✨</span>
+            <span class="star-icon">⭐</span>
+            <span class="star-icon">🌟</span>
+          </div>
+          <span class="check-text">星星正在审核...</span>
+        {:else if isSubmitting}
           发布中...
         {:else}
           <Icon name="sparkles" size={20} /> 发布心愿
@@ -550,6 +562,58 @@
   .submit-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  
+  /* ========================================
+     能量检测动画
+     ======================================== */
+  
+  .energy-check-animation {
+    display: inline-flex;
+    gap: 4px;
+    margin-right: 8px;
+  }
+  
+  .star-icon {
+    display: inline-block;
+    animation: starPulse 1.5s ease-in-out infinite;
+  }
+  
+  .star-icon:nth-child(1) {
+    animation-delay: 0s;
+  }
+  
+  .star-icon:nth-child(2) {
+    animation-delay: 0.3s;
+    transform: translateY(-2px);
+  }
+  
+  .star-icon:nth-child(3) {
+    animation-delay: 0.6s;
+  }
+  
+  @keyframes starPulse {
+    0%, 100% {
+      opacity: 0.4;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+  
+  .check-text {
+    animation: textPulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes textPulse {
+    0%, 100% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 1;
+    }
   }
   
   /* ========================================
