@@ -173,7 +173,7 @@
     background: linear-gradient(135deg, rgba(30, 60, 114, 0.95), rgba(42, 82, 152, 0.9));
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    padding: 24px;
+    padding: 20px 24px;
     width: 100%;
     max-width: 600px;
     margin: 16px auto;
@@ -198,7 +198,7 @@
     display: flex;
     justify-content: center;
     gap: 16px;
-    margin-bottom: 12px;
+    margin-bottom: -8px;
   }
   
   .action-btn {
@@ -261,8 +261,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 0;
+    padding: 0;
     margin-bottom: 16px;
+    margin-top: -4px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   
