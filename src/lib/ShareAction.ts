@@ -282,3 +282,100 @@ export async function triggerShare(
 export function isWebShareSupported(): boolean {
   return typeof navigator.share === 'function';
 }
+
+/**
+ * 检测当前浏览器是否为微信内置浏览器
+ * 
+ * @description 通过 UA 中的 "micromessenger" 字符串判断（小写）
+ * @returns boolean - true 表示微信内置浏览器，false 表示其他浏览器
+ * 
+ * @example
+ * ```typescript
+ * if (isWechatBrowser()) {
+ *   // 微信环境：显示链接提示用户手动复制
+ *   shareToWechat(url);
+ * } else {
+ *   // 非微信环境：直接复制链接
+ *   await copyLinkToClipboard(url);
+ * }
+ * ```
+ */
+export function isWechatBrowser(): boolean {
+  // [CRITICAL] 检查 UA 中是否包含 "micromessenger"（小写）
+  const userAgent = navigator.userAgent || '';
+  return userAgent.toLowerCase().includes('micromessenger');
+}
+
+/**
+ * 复制心愿内容 + 链接到剪贴板
+ * 
+ * @description 合并复制心愿文本和分享链接，格式为：心愿内容\n链接
+ * @param wishText 心愿内容
+ * @param wishKey 心愿小钥匙（6位 nanoid）
+ * @returns Promise<ShareResult> - 复制结果
+ * 
+ * @example
+ * ```typescript
+ * const result = await copyWishWithLink('我的心愿是...', 'ABC123');
+ * // 复制内容：我的心愿是...\nhttps://mywish.starseas.org/wish/ABC123
+ * if (result.success) {
+ *   showToast(result.message);
+ * }
+ * ```
+ */
+export async function copyWishWithLink(wishText: string, wishKey: string): Promise<ShareResult> {
+  // [CRITICAL] 生成分享链接
+  const shareUrl = generateShareUrl(wishKey);
+  
+  // [CRITICAL] 构造复制内容：心愿内容 + 换行 + 链接
+  const copyContent = `${wishText}\n${shareUrl}`;
+  
+  try {
+    // [CRITICAL] 使用现代 Clipboard API
+    await navigator.clipboard.writeText(copyContent);
+    
+    return {
+      success: true,
+      message: '心愿内容与链接已复制到剪贴板',
+      method: 'clipboard'
+    };
+  } catch (err) {
+    // [CRITICAL] 降级方案：使用传统复制方法
+    console.warn('[ShareAction] Clipboard API 失败，尝试降级方案:', err);
+    
+    try {
+      // 创建临时 textarea 元素
+      const textarea = document.createElement('textarea');
+      textarea.value = copyContent;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      textarea.style.left = '-9999px';
+      
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+      
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      
+      if (success) {
+        return {
+          success: true,
+          message: '心愿内容与链接已复制到剪贴板',
+          method: 'clipboard'
+        };
+      } else {
+        return {
+          success: false,
+          message: '复制失败，请手动复制'
+        };
+      }
+    } catch (fallbackErr) {
+      console.error('[ShareAction] 降级复制失败:', fallbackErr);
+      return {
+        success: false,
+        message: '复制失败，请手动复制'
+      };
+    }
+  }
+}

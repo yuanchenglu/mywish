@@ -4,10 +4,11 @@
   interface Props {
     activeTab: TabType;
     onTabChange: (tab: TabType) => void;
+    onTabRefresh: (tab: TabType) => void; // 点击当前Tab刷新
     onPublishClick: () => void;
   }
   
-  let { activeTab, onTabChange, onPublishClick }: Props = $props();
+  let { activeTab, onTabChange, onTabRefresh, onPublishClick }: Props = $props();
   
   const tabs: { id: TabType; label: string }[] = [
     { id: 'square', label: '星愿广场' },
@@ -18,7 +19,11 @@
   function handleTabClick(tabId: TabType) {
     if (tabId === 'publish') {
       onPublishClick();
+    } else if (tabId === activeTab) {
+      // 点击当前Tab，触发刷新
+      onTabRefresh(tabId);
     } else {
+      // 切换到其他Tab
       onTabChange(tabId);
     }
   }

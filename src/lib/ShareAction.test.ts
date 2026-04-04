@@ -6,7 +6,9 @@ import {
   shareToWechat,
   shareWithWebAPI,
   triggerShare,
-  isWebShareSupported
+  isWebShareSupported,
+  isWechatBrowser,
+  copyWishWithLink
 } from './ShareAction';
 
 describe('ShareAction 分享动作逻辑', () => {
@@ -267,6 +269,119 @@ describe('ShareAction 分享动作逻辑', () => {
       });
 
       expect(isWebShareSupported()).toBe(false);
+    });
+  });
+
+  describe('isWechatBrowser', () => {
+    it('应该在微信 UA 时返回 true', () => {
+      // Mock 微信 UA
+      Object.defineProperty(navigator, 'userAgent', {
+        value: 'Mozilla/5.0 (Linux; Android 10; ...) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/89.0.4389.72 MQQBrowser/6.2 TBS/046291 Mobile Safari/537.36 MicroMessenger/8.0.1.184(0x28001158)',
+        configurable: true
+      });
+
+      expect(isWechatBrowser()).toBe(true);
+    });
+
+    it('应该在非微信 UA 时返回 false', () => {
+      // Mock Chrome UA
+      Object.defineProperty(navigator, 'userAgent', {
+        value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        configurable: true
+      });
+
+      expect(isWechatBrowser()).toBe(false);
+    });
+
+    it('应该在 UA 包含大写 MicroMessenger 时返回 true', () => {
+      // Mock 微信 UA（大写）
+      Object.defineProperty(navigator, 'userAgent', {
+        value: 'Mozilla/5.0 MicroMessenger/8.0.1',
+        configurable: true
+      });
+
+      expect(isWechatBrowser()).toBe(true);
+    });
+
+    it('应该在 userAgent 为空时返回 false', () => {
+      // Mock 空 UA
+      Object.defineProperty(navigator, 'userAgent', {
+        value: '',
+        configurable: true
+      });
+
+      expect(isWechatBrowser()).toBe(false);
+    });
+  });
+
+  describe('copyWishWithLink', () => {
+    it('应该成功复制心愿内容和链接', async () => {
+      const wishText = '我的心愿是世界和平';
+      const wishKey = 'ABC123';
+      const result = await copyWishWithLink(wishText, wishKey);
+
+      expect(result.success).toBe(true);
+      expect(result.message).toBe('心愿内容与链接已复制到剪贴板');
+      expect(result.method).toBe('clipboard');
+      
+      // 验证复制内容格式
+      const expectedContent = '我的心愿是世界和平\nhttps://mywish.starseas.org/wish/ABC123';
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(expectedContent);
+    });
+
+    it('应该在 Clipboard API 失败时使用降级方案', async () => {
+      // Mock Clipboard API 失败
+      const clipboardMock = {
+        writeText: vi.fn().mockRejectedValue(new Error('Clipboard API 失败'))
+      };
+      Object.defineProperty(navigator, 'clipboard', {
+        value: clipboardMock,
+        configurable: true
+      });
+
+      const wishText = '我的心愿是...';
+      const wishKey = 'XYZ789';
+      const result = await copyWishWithLink(wishText, wishKey);
+
+      expect(result.success).toBe(true);
+      expect(result.message).toBe('心愿内容与链接已复制到剪贴板');
+      expect(result.method).toBe('clipboard');
+    });
+
+    it('应该在降级方案也失败时返回失败结果', async () => {
+      // Mock Clipboard API 失败
+      const clipboardMock = {
+        writeText: vi.fn().mockRejectedValue(new Error('Clipboard API 失败'))
+      };
+      Object.defineProperty(navigator, 'clipboard', {
+        value: clipboardMock,
+        configurable: true
+      });
+
+      // Mock execCommand 失败
+      Object.defineProperty(document, 'execCommand', {
+        value: vi.fn().mockReturnValue(false),
+        configurable: true,
+        writable: true
+      });
+
+      const wishText = '我的心愿是...';
+      const wishKey = 'ABC123';
+      const result = await copyWishWithLink(wishText, wishKey);
+
+      expect(result.success).toBe(false);
+      expect(result.message).toBe('复制失败，请手动复制');
+    });
+
+    it('应该构造正确的复制格式（心愿内容 + 换行 + 链接）', async () => {
+      const wishText = '希望家人健康平安';
+      const wishKey = 'TEST456';
+      await copyWishWithLink(wishText, wishKey);
+
+      const copyContent = (navigator.clipboard.writeText as any).mock.calls[0][0];
+      expect(copyContent).toContain(wishText);
+      expect(copyContent).toContain('\n');
+      expect(copyContent).toContain('https://mywish.starseas.org/wish/TEST456');
     });
   });
 });
