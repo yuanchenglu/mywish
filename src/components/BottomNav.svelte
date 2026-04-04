@@ -10,9 +10,9 @@
   let { activeTab, onTabChange, onPublishClick }: Props = $props();
   
   const tabs: { id: TabType; label: string }[] = [
-    { id: 'like', label: '瓦数Top3' },
+    { id: 'square', label: '星愿广场' },
     { id: 'publish', label: '许个心愿' },
-    { id: 'square', label: '许愿广场' }
+    { id: 'like', label: '星+Top3' }
   ];
   
   function handleTabClick(tabId: TabType) {
