@@ -93,6 +93,8 @@ export interface HourlyTopItem {
   likes_increment: number;
   /** 排名称号 */
   rank: '状元' | '榜眼' | '探花';
+  /** 创建时间（可选，用于显示） */
+  created_at?: string;
 }
 
 /**

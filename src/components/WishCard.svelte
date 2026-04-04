@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Wish } from '../../workers/lib/kv-schema';
+  import type { Wish, HourlyTopItem } from '../../workers/lib/kv-schema';
   import Icon from '../lib/components/Icon.svelte';
   import { triggerLikeAnimation } from '../lib/LikeAction';
   
-  interface WishWithRealtime extends Wish {
+  interface WishWithRealtime extends Partial<Wish>, Partial<HourlyTopItem> {
     realtime_likes?: number;
     realtime_likes_increment?: number;
     likes_increment?: number;
@@ -21,9 +21,9 @@
   
   let showToast = $state(false);
   let toastMessage = $state('');
-  let currentLikes = $state(wish.realtime_likes || wish.likes);
+  let currentLikes = $state(wish.realtime_likes || wish.likes || 0);
   let likesIncrement = $state(wish.realtime_likes_increment || wish.likes_increment || 0);
-  let relativeTime = $derived(formatRelativeTime(wish.created_at));
+  let relativeTime = $derived(formatRelativeTime(wish.created_at || ''));
   
   let displayLikes = $derived(variant === 'top3' ? likesIncrement : currentLikes);
   
@@ -33,6 +33,13 @@
   
   function formatRelativeTime(dateString: string): string {
     const date = new Date(dateString);
+    
+    // ✅ 检查日期是否有效
+    if (isNaN(date.getTime())) {
+      console.warn('无效日期:', dateString);
+      return '未知时间';
+    }
+    
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffSeconds = Math.floor(diffMs / 1000);
@@ -62,8 +69,10 @@
       
       if (json.success) {
         currentLikes = json.data.likes;
-        likesIncrement = json.data.hour_likes || likesIncrement + 1;
+        // API 没返回 hour_likes，所以手动 +1 作为本地显示
+        likesIncrement = likesIncrement + 1;
         
+        // ✅ 动画播放完整，不触发父组件更新
         likesAnimating = true;
         setTimeout(() => likesAnimating = false, 500);
         
@@ -77,7 +86,7 @@
         showToast = true;
         toastMessage = '愿星辰大海守护你';
         setTimeout(() => showToast = false, 2000);
-        onLike?.();
+        // ❌ 不调用 onLike?.()，避免触发父组件重新加载
       }
     } catch (e) {
       console.error('点赞失败', e);
@@ -107,7 +116,7 @@
   
   async function copyKey() {
     try {
-      await navigator.clipboard.writeText(wish.key);
+      await navigator.clipboard.writeText(wish.key || '');
       showToast = true;
       toastMessage = '心愿小钥匙已保存';
       setTimeout(() => showToast = false, 2000);
@@ -132,6 +141,14 @@
   
   <p class="wish-text">{wish.text}</p>
   
+  <div class="wish-footer">
+    <button class="wish-key" onclick={copyKey} title="点击复制密钥">
+      <Icon name="key" size={12} class="key-icon" />
+      {wish.key}
+    </button>
+    <span class="wish-time">{relativeTime}</span>
+  </div>
+  
   <div class="wish-actions">
     <button class="action-btn like-btn" onclick={handleLikeClick} disabled={isLiking}>
       <Icon name="sparkles" size={16} class="btn-icon" />
@@ -142,16 +159,6 @@
       <Icon name="share" size={16} class="btn-icon" />
       <span>分享</span>
     </button>
-  </div>
-  
-  <div class="wish-footer">
-    <button class="wish-key" onclick={copyKey} title="点击复制密钥">
-      <Icon name="key" size={12} class="key-icon" />
-      {wish.key}
-    </button>
-    <time class="wish-time" datetime={wish.created_at}>
-      {relativeTime}
-    </time>
   </div>
   
   {#if showToast}
@@ -245,38 +252,44 @@
     border-color: rgba(100, 200, 150, 0.5);
   }
   
+  /* 心愿密钥和时间区域 - 居中显示 */
   .wish-footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding-top: 8px;
+    gap: 12px;
+    margin: 16px 0;
+    padding: 12px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   
   .wish-key {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
     background: transparent;
     border: none;
-    padding: 4px 8px;
+    padding: 6px 12px;
+    border-radius: 16px;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     gap: 4px;
   }
   
   .wish-key:hover {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.05);
   }
   
   .key-icon {
-    opacity: 0.6;
+    opacity: 0.7;
   }
   
   .wish-time {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
   }
   
   .toast {

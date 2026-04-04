@@ -399,9 +399,9 @@
     /* 圆角 */
     border-radius: var(--radius-base);
     
-    /* 边框和背景 */
-    background: transparent;
-    border: 1px solid var(--color-border-default);
+    /* 边框和背景 - ✅ 使用白色背景，深色图标 */
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     
     /* 过渡动画 */
     transition: all var(--duration-fast) var(--ease-out);
@@ -413,8 +413,8 @@
   }
   
   .regenerate-btn:hover {
-    /* hover 效果 */
-    background: var(--color-bg-card);
+    /* hover 效果 - ✅ 更亮的白色背景 */
+    background: rgba(255, 255, 255, 0.25);
     box-shadow: var(--shadow-glow);
   }
   

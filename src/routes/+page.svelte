@@ -16,7 +16,7 @@
     realtime_likes_increment?: number;
   }
   
-  let activeTab = $state<TabType>('like');
+  let activeTab = $state<TabType>('square');
   let wishes = $state<Wish[]>([]);
   let top3Wishes = $state<HourlyTopItem[]>([]);
   let loading = $state(true);
@@ -33,7 +33,7 @@
   
   onMount(() => {
     checkFirstTimeIntro();
-    loadTop3();
+    loadWishes(); // 默认加载星愿广场数据
     window.addEventListener('scroll', handleScroll);
     
     return () => {
@@ -193,8 +193,8 @@
 </script>
 
 <svelte:head>
-  <title>星+Top3 - 星辰大海 My Wish</title>
-  <meta name="description" content="每小时星星增量排行，点亮最闪耀的心愿" />
+  <title>星愿广场 - 星辰大海 My Wish</title>
+  <meta name="description" content="漫步星空，查看所有心愿，传递祝福" />
 </svelte:head>
 
 <main class="page-content">

@@ -76,7 +76,8 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
       key: w!.key,
       text: w!.text,
       likes_increment: w!.likes_increment,
-      rank: getRankTitle(index + 1)
+      rank: getRankTitle(index + 1),
+      created_at: w!.created_at
     }));
     
     // 5. 返回响应
