@@ -100,7 +100,7 @@
         showToast = true;
         toastMessage = json.message || json.error || '发布失败，请重试';
         toastType = 'error';
-        setTimeout(() => { showToast = false; }, 3000);
+        setTimeout(() => { showToast = false; }, 5000);
       }
       
     } catch (err) {
@@ -628,13 +628,20 @@
     
     background: var(--color-bg-overlay);
     color: var(--color-text-primary);
-    padding: var(--space-3) var(--space-6);
+    padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-base);
     
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--color-border-light);
     
     z-index: 300;
+    
+    min-width: 280px;
+    max-width: 400px;
+    width: auto;
+    
+    text-align: center;
+    line-height: 1.5;
     
     animation: fadeIn 0.3s var(--ease-out);
   }
