@@ -25,7 +25,8 @@
   let likesIncrement = $state(wish.realtime_likes_increment || wish.likes_increment || 0);
   let relativeTime = $derived(formatRelativeTime(wish.created_at || ''));
   
-  let displayLikes = $derived(variant === 'top3' ? likesIncrement : currentLikes);
+  // Top3 模式显示总星数（currentLikes），普通模式也显示总星数
+  let displayLikes = $derived(currentLikes);
   
   let isLiking = $state(false);
   let cardElement: HTMLElement | undefined;
@@ -127,6 +128,14 @@
 </script>
 
 <article class="wish-card {variant === 'top3' ? 'top3-card' : ''}" bind:this={cardElement}>
+  <div class="wish-header">
+    <button class="wish-key" onclick={copyKey} title="点击复制密钥">
+      <Icon name="key" size={12} class="key-icon" />
+      {wish.key}
+    </button>
+    <span class="wish-time">{relativeTime}</span>
+  </div>
+  
   {#if wish.rank}
     <div class="rank-badge {wish.rank === '状元' ? 'badge-gold' : wish.rank === '榜眼' ? 'badge-silver' : 'badge-bronze'}">
       {#if wish.rank === '状元'}
@@ -136,18 +145,11 @@
       {:else}
         🥉 探花
       {/if}
+      <span class="increment-badge">星+ ({likesIncrement})</span>
     </div>
   {/if}
   
   <p class="wish-text">{wish.text}</p>
-  
-  <div class="wish-footer">
-    <button class="wish-key" onclick={copyKey} title="点击复制密钥">
-      <Icon name="key" size={12} class="key-icon" />
-      {wish.key}
-    </button>
-    <span class="wish-time">{relativeTime}</span>
-  </div>
   
   <div class="wish-actions">
     <button class="action-btn like-btn" onclick={handleLikeClick} disabled={isLiking}>
@@ -252,15 +254,12 @@
     border-color: rgba(100, 200, 150, 0.5);
   }
   
-  /* 心愿密钥和时间区域 - 居中显示 */
-  .wish-footer {
+  .wish-header {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    margin: 16px 0;
-    padding: 12px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 8px 0;
+    margin-bottom: 12px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   
@@ -380,5 +379,12 @@
   @keyframes badgeShine {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.85; }
+  }
+  
+  .increment-badge {
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 12px;
+    opacity: 0.9;
   }
 </style>

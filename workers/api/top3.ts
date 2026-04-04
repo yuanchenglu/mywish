@@ -54,18 +54,24 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
         const wish = await env.KV.get(kvKey.wish(id), 'json') as Wish | null;
         if (!wish) return null;
         
+        // 获取该小时增量
         const hourIncrement = await env.KV.get(kvKey.likesHour(currentHour, id));
         const increment = parseInt(hourIncrement || '0', 10);
         
+        // 获取总星数
+        const likesCount = await env.KV.get(kvKey.likes(id));
+        const likes = parseInt(likesCount || '0', 10);
+        
         return {
           ...wish,
-          likes_increment: increment
+          likes_increment: increment,
+          likes
         };
       })
     );
     
     // 3. 过滤掉 null，按增量降序排序，取前3
-    const validWishes = wishesWithIncrement.filter(w => w !== null && w.likes_increment > 0) as Array<Wish & { likes_increment: number }>;
+    const validWishes = wishesWithIncrement.filter(w => w !== null && w.likes_increment > 0) as Array<Wish & { likes_increment: number; likes: number }>;
     const sorted = validWishes
       .sort((a, b) => b.likes_increment - a.likes_increment)
       .slice(0, 3);
@@ -75,6 +81,7 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
       id: w!.id,
       key: w!.key,
       text: w!.text,
+      likes: w!.likes,
       likes_increment: w!.likes_increment,
       rank: getRankTitle(index + 1),
       created_at: w!.created_at

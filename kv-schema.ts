@@ -89,6 +89,8 @@ export interface HourlyTopItem {
   key: string;
   /** 心愿内容 */
   text: string;
+  /** 总点赞数（用于底部按钮显示） */
+  likes: number;
   /** 该小时内的星星增量 */
   likes_increment: number;
   /** 排名称号 */
