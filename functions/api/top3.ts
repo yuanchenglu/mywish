@@ -69,7 +69,8 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
       text: w.text,
       likes: w.likes,
       likes_increment: w.likes_increment,
-      rank: getRankTitle(index + 1)
+      rank: getRankTitle(index + 1),
+      created_at: w.created_at
     }));
     
     return new Response(JSON.stringify({
