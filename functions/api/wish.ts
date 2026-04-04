@@ -33,7 +33,7 @@ const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
  */
 interface Env {
   KV: KVNamespace;
-  BAILIAN_API_KEY: string;
+  DEEPSEEK_API_KEY: string;
 }
 
 // ============================================================================
@@ -238,7 +238,7 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
     
     // Step 2.5: AI 正能量检测
     const sanitizedTextForCheck = sanitizeWishText(body.text);
-    const energyCheck = await checkPositiveEnergy(env.BAILIAN_API_KEY, sanitizedTextForCheck);
+    const energyCheck = await checkPositiveEnergy(env.DEEPSEEK_API_KEY, sanitizedTextForCheck);
     if (!energyCheck.positive) {
       return buildErrorResponse(400, 'NEGATIVE_CONTENT', 
         '此小心愿负面能量大于正面能量，无法发布，为维护社区氛围，只有正能量的小心愿才能发布。望理解！');
