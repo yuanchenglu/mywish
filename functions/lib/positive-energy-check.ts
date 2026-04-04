@@ -82,10 +82,10 @@ async function callBailianAI(
 ): Promise<PositiveEnergyResult> {
   const prompt = buildPrompt(wishText);
   
-  // 构建请求体（Anthropic Messages API 格式）
+  // 使用百炼标准 API（OpenAI 兼容格式）
   const requestBody = {
-    model: 'MiniMax-M2.5',
-    max_tokens: 256,  // 检测结果很短，256 足够
+    model: 'qwen-plus',
+    max_tokens: 256,
     messages: [
       {
         role: 'user',
@@ -99,12 +99,12 @@ async function callBailianAI(
   const timeoutId = setTimeout(() => controller.abort(), timeout);
   
   try {
-    const response = await fetch('https://coding.dashscope.aliyuncs.com/apps/anthropic/v1/messages', {
+    // 百炼标准 API 端点（OpenAI 兼容）
+    const response = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify(requestBody),
       signal: controller.signal
@@ -118,14 +118,19 @@ async function callBailianAI(
       return { positive: true, reason: 'AI检测暂时不可用' };
     }
     
+    // OpenAI 兼容格式响应
     const data = await response.json() as {
-      content: Array<{ type: string; text: string; thinking?: string }>;
-      stop_reason: string;
+      choices: Array<{
+        message: {
+          content: string;
+          role: string;
+        };
+        finish_reason: string;
+      }>;
     };
     
-    // 找到 text 类型的内容（跳过 thinking）
-    const textContent = data.content?.find(c => c.type === 'text');
-    const aiText = textContent?.text || '';
+    // OpenAI 格式：直接从 choices[0].message.content 获取文本
+    const aiText = data.choices?.[0]?.message?.content || '';
     
     // 尝试提取 JSON（支持 ```json 代码块格式）
     const codeBlockMatch = aiText.match(/```json\s*\n?([\s\S]*?)\n?```/);

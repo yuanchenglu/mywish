@@ -36,11 +36,11 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
       });
     }
     
-    // Step 2: 调用百炼 API
+    // Step 2: 调用百炼 API（标准 API）
     const startTime = Date.now();
     
     const requestBody = {
-      model: 'MiniMax-M2.5',
+      model: 'qwen-plus',
       max_tokens: 256,
       messages: [{
         role: 'user',
@@ -48,12 +48,11 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
       }]
     };
     
-    const response = await fetch('https://coding.dashscope.aliyuncs.com/apps/anthropic/v1/messages', {
+    const response = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': env.BAILIAN_API_KEY,
-        'anthropic-version': '2023-06-01'
+        'Authorization': `Bearer ${env.BAILIAN_API_KEY}`
       },
       body: JSON.stringify(requestBody)
     });
@@ -79,11 +78,14 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
       });
     } else {
       const data = await response.json() as {
-        content: Array<{ type: string; text: string }>;
+        choices: Array<{
+          message: {
+            content: string;
+          };
+        }>;
       };
       
-      const textContent = data.content?.find(c => c.type === 'text');
-      const aiText = textContent?.text || '';
+      const aiText = data.choices?.[0]?.message?.content || '';
       
       results.push({
         step: 'bailian_api_response',
