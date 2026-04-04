@@ -2,6 +2,7 @@
   import type { Wish, HourlyTopItem } from '../../workers/lib/kv-schema';
   import Icon from '../lib/components/Icon.svelte';
   import { triggerLikeAnimation } from '../lib/LikeAction';
+  import { isWechatBrowser, copyWishWithLink } from '../lib/ShareAction';
   
   interface WishWithRealtime extends Partial<Wish>, Partial<HourlyTopItem> {
     realtime_likes?: number;
@@ -97,6 +98,17 @@
   }
   
   async function handleShareClick() {
+    // [CRITICAL] 微信环境：复制心愿内容+链接
+    if (isWechatBrowser()) {
+      const result = await copyWishWithLink(wish.text, wish.key);
+      showToast = true;
+      toastMessage = '此心愿已复制，可直接打开与好友的对话进行分享';
+      setTimeout(() => showToast = false, 3000);
+      onShare?.();
+      return;
+    }
+    
+    // [CRITICAL] 浏览器环境：保持原有 Web Share API 逻辑
     const url = `${window.location.origin}/wish/${wish.key}`;
     
     if (navigator.share) {
@@ -173,7 +185,7 @@
     background: linear-gradient(135deg, rgba(30, 60, 114, 0.95), rgba(42, 82, 152, 0.9));
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    padding: 20px 24px;
+    padding: 20px 24px 28px;
     width: 100%;
     max-width: 600px;
     margin: 16px auto;
@@ -188,17 +200,20 @@
     color: #fff;
     line-height: 2;
     text-align: center;
-    margin: 0 0 24px;
+    margin: 0;
     word-wrap: break-word;
-    min-height: 100px;
-    flex: 1;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .wish-actions {
     display: flex;
     justify-content: center;
     gap: 16px;
-    margin-bottom: -8px;
+    margin-bottom: 0;
+    margin-top: 24px;
   }
   
   .action-btn {
@@ -262,8 +277,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0;
-    margin-bottom: 16px;
-    margin-top: -4px;
+    margin-bottom: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   
@@ -330,15 +344,14 @@
   }
   
   .top3-card {
-    padding: 28px 28px;
+    padding: 20px 28px 28px;
     margin: 20px auto;
     max-width: 500px;
   }
   
   .top3-card .wish-text {
     font-size: 22px;
-    min-height: 120px;
-    margin-bottom: 28px;
+    min-height: 100px;
   }
   
   .top3-card .wish-actions {
