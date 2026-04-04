@@ -173,22 +173,25 @@
     background: linear-gradient(135deg, rgba(30, 60, 114, 0.95), rgba(42, 82, 152, 0.9));
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    padding: 20px;
+    padding: 24px;
     width: 100%;
     max-width: 600px;
-    margin: 12px auto;
+    margin: 16px auto;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
   }
   
   .wish-text {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
     color: #fff;
-    line-height: 1.7;
+    line-height: 2;
     text-align: center;
-    margin: 0 0 16px;
+    margin: 0 0 24px;
     word-wrap: break-word;
-    min-height: 50px;
+    min-height: 100px;
+    flex: 1;
   }
   
   .wish-actions {
@@ -258,8 +261,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
-    margin-bottom: 12px;
+    padding: 6px 0;
+    margin-bottom: 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   
@@ -326,14 +329,15 @@
   }
   
   .top3-card {
-    padding: 28px 24px;
-    margin: 16px auto;
+    padding: 28px 28px;
+    margin: 20px auto;
     max-width: 500px;
   }
   
   .top3-card .wish-text {
-    font-size: 20px;
-    min-height: 60px;
+    font-size: 22px;
+    min-height: 120px;
+    margin-bottom: 28px;
   }
   
   .top3-card .wish-actions {
