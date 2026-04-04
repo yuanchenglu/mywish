@@ -13,13 +13,8 @@
  * - node scripts/seed-wishes.js --help          # 显示用法
  */
 
-// ============================================================================
-// 100 条「打开心扉」心愿
-// ============================================================================
-
 const WISHES = [
   // --- 深夜心事（15条）---
-  // 凌晨三点醒来的那些念头
   "希望能睡个好觉，最近总是凌晨三点醒来，盯着天花板到天亮",
   "想给三年前的自己打个电话，告诉他别做那个决定",
   "希望妈妈不要每次打电话都问我什么时候结婚",
@@ -37,7 +32,6 @@ const WISHES = [
   "希望明天醒来，一切都会好起来",
   
   // --- 家人之间（15条）---
-  // 那些想说但没说出口的话
   "下个月回家，想和爸爸好好聊一次天，但我不知道怎么开口",
   "希望妈妈不要再省了，你值得好的东西",
   "爸，我其实一直没告诉你，当初选专业是我自己决定的",
@@ -55,7 +49,6 @@ const WISHES = [
   "希望家人平安，比什么都重要",
   
   // --- 爱情那些事（15条）---
-  // 爱而不得、得而复失、失而难忘
   "希望能遇到一个，愿意听我说废话的人",
   "我们分手三年了，我还是会看你的朋友圈",
   "希望他能懂我的小情绪，而不是觉得我作",
@@ -73,7 +66,6 @@ const WISHES = [
   "分手的时候，我们都没有好好说再见",
   
   // --- 工作与梦想（15条）---
-  // 现实的无奈与坚持
   "希望能找到一份真正喜欢的工作，而不只是为了生存",
   "加班到凌晨，希望这一切都是值得的",
   "创业第三年，还是很难，希望今年能好一点",
@@ -91,7 +83,6 @@ const WISHES = [
   "每个月还房贷，压力好大，希望一切值得",
   
   // --- 学业与未来（10条）---
-  // 年轻的焦虑与期待
   "希望考研上岸，这一年我没白努力",
   "高考倒计时60天，希望能考上",
   "毕业了，不知道未来在哪里，希望找到方向",
@@ -104,7 +95,6 @@ const WISHES = [
   "不想考公，但不知道还能做什么",
   
   // --- 身体与心理（10条）---
-  // 看不见的战场
   "希望失眠能好起来，真的太累了",
   "抑郁症两年了，希望有一天能好起来",
   "希望能好好吃饭，好好睡觉，好好爱自己",
@@ -117,7 +107,6 @@ const WISHES = [
   "希望心理健康，和身体健康一样被重视",
   
   // --- 小小的愿望（10条）---
-  // 看起来很小，但很重要
   "希望能养一只猫，取名叫土豆",
   "希望看完今年列的书单，不要又打脸",
   "希望学会游泳，不再怕水",
@@ -130,7 +119,6 @@ const WISHES = [
   "希望学会独处，享受一个人的时光",
   
   // --- 社会与远方（10条）---
-  // 我们都是更大世界的一部分
   "希望世界和平，不再有战争，孩子们都能好好长大",
   "希望流浪的小动物都能找到一个温暖的家",
   "希望有一天能去一次冰岛，看看极光",
@@ -143,77 +131,39 @@ const WISHES = [
   "愿星辰大海，守护每一个努力活着的人",
 ];
 
-// ============================================================================
-// 幂律分布配置
-// ============================================================================
-
 // 头部心愿（Top 5）- 最击中人心的那句
 const HOT_INDICES = [0, 23, 4, 12, 30];
 
 // 肩部心愿（Top 6-15）- 有具体场景，能共鸣
 const WARM_INDICES = [1, 2, 5, 6, 7, 22, 25, 36, 40, 45];
 
-// 点赞范围配置
+// 点赞范围配置（幂律分布）
 const LIKE_RANGES = {
-  hot: { min: 150, max: 300 },    // 头部：150-300
-  warm: { min: 50, max: 100 },    // 肩部：50-100
-  body: { min: 15, max: 50 },     // 躯干：15-50
-  tail: { min: 1, max: 15 },      // 尾部：1-15
+  hot: { min: 150, max: 300 },
+  warm: { min: 50, max: 100 },
+  body: { min: 15, max: 50 },
+  tail: { min: 1, max: 15 },
 };
 
-// 推荐范围配置
-const REC_RANGES = {
-  hot: { min: 80, max: 150 },     // 头部：80-150
-  warm: { min: 25, max: 60 },     // 肩部：25-60
-  body: { min: 8, max: 25 },      // 躯干：8-25
-  tail: { min: 0, max: 10 },      // 尾部：0-10
-};
-
-// ============================================================================
-// 时间分布配置
-// ============================================================================
-
-/**
- * 时间分布设计
- * - 今天（5条）：最当下的心声
- * - 这一周（15条）：近期的事
- * - 这一个月（25条）：一直惦记的
- * - 1-3月（30条）：持续的愿望
- * - 更早（25条）：时间沉淀
- */
 function getTimeOffset(index) {
   const now = Date.now();
   const DAY = 24 * 60 * 60 * 1000;
   
-  // 深夜心愿 → 凌晨发布（更有氛围感）
-  // 工作心愿 → 工作日发布
-  // 情感心愿 → 晚间发布
-  
   if (index < 5) {
-    // 今天：随机时间戳（0-24小时内）
-    // 深夜心愿倾向凌晨发布
     const hourOffset = index < 3 ? 
-      Math.floor(Math.random() * 6) + 0 :  // 0-6点（凌晨）
-      Math.floor(Math.random() * 18) + 6;   // 6-24点
+      Math.floor(Math.random() * 6) + 0 :
+      Math.floor(Math.random() * 18) + 6;
     return -(hourOffset * 60 * 60 * 1000);
   } else if (index < 20) {
-    // 这一周：1-7天前
     return -(Math.floor(Math.random() * 7) + 1) * DAY;
   } else if (index < 45) {
-    // 这一个月：8-30天前
     return -(Math.floor(Math.random() * 23) + 8) * DAY;
   } else if (index < 75) {
-    // 1-3月：31-90天前
     return -(Math.floor(Math.random() * 60) + 31) * DAY;
   } else {
-    // 更早：91-180天前
     return -(Math.floor(Math.random() * 90) + 91) * DAY;
   }
 }
-
-// ============================================================================
-// 工具函数
-// ============================================================================
 
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -223,10 +173,6 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ============================================================================
-// API 调用函数
-// ============================================================================
-
 async function createWish(baseUrl, text, timeOffset) {
   try {
     const res = await fetch(`${baseUrl}/api/wish`, {
@@ -234,7 +180,7 @@ async function createWish(baseUrl, text, timeOffset) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         text,
-        createdAt: Date.now() + timeOffset  // 应用时间偏移
+        createdAt: Date.now() + timeOffset
       })
     });
     const json = await res.json();
@@ -258,7 +204,6 @@ async function addLikes(baseUrl, key, count) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wishKey: key })
       });
-      // 批量操作时添加短暂延迟，避免请求过快
       if (i % 20 === 0 && count > 20) {
         await sleep(50);
       }
@@ -270,29 +215,6 @@ async function addLikes(baseUrl, key, count) {
   }
 }
 
-async function addRecommends(baseUrl, key, count) {
-  try {
-    for (let i = 0; i < count; i++) {
-      await fetch(`${baseUrl}/api/recommend`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wishKey: key })
-      });
-      if (i % 20 === 0 && count > 20) {
-        await sleep(50);
-      }
-    }
-    return true;
-  } catch (e) {
-    console.error(`❌ 推荐失败: ${key}`);
-    return false;
-  }
-}
-
-// ============================================================================
-// 主流程
-// ============================================================================
-
 async function main(baseUrl) {
   console.log('\n');
   console.log('╔════════════════════════════════════════════════════════════╗');
@@ -303,14 +225,13 @@ async function main(baseUrl) {
   
   console.log(`📍 目标环境: ${baseUrl}`);
   console.log(`📝 心愿总数: ${WISHES.length} 条`);
-  console.log(`📊 幂律分布:`);
-  console.log(`   - 头部（${HOT_INDICES.length}条）：点赞 ${LIKE_RANGES.hot.min}-${LIKE_RANGES.hot.max}，推荐 ${REC_RANGES.hot.min}-${REC_RANGES.hot.max}`);
-  console.log(`   - 肩部（${WARM_INDICES.length}条）：点赞 ${LIKE_RANGES.warm.min}-${LIKE_RANGES.warm.max}，推荐 ${REC_RANGES.warm.min}-${REC_RANGES.warm.max}`);
-  console.log(`   - 躯干（30条）：点赞 ${LIKE_RANGES.body.min}-${LIKE_RANGES.body.max}，推荐 ${REC_RANGES.body.min}-${REC_RANGES.body.max}`);
-  console.log(`   - 尾部（55条）：点赞 ${LIKE_RANGES.tail.min}-${LIKE_RANGES.tail.max}，推荐 ${REC_RANGES.tail.min}-${REC_RANGES.tail.max}`);
+  console.log(`📊 点赞分布（幂律分布）:`);
+  console.log(`   - 头部（${HOT_INDICES.length}条）：${LIKE_RANGES.hot.min}-${LIKE_RANGES.hot.max} ⭐`);
+  console.log(`   - 肩部（${WARM_INDICES.length}条）：${LIKE_RANGES.warm.min}-${LIKE_RANGES.warm.max} ⭐`);
+  console.log(`   - 躯干（30条）：${LIKE_RANGES.body.min}-${LIKE_RANGES.body.max} ⭐`);
+  console.log(`   - 尾部（55条）：${LIKE_RANGES.tail.min}-${LIKE_RANGES.tail.max} ⭐`);
   console.log('\n');
   
-  // Step 1: 创建所有心愿
   console.log('🚀 Step 1: 创建心愿...');
   console.log('─────────────────────────────────────────');
   
@@ -326,7 +247,6 @@ async function main(baseUrl) {
       process.stdout.write(`\r✅ [${i + 1}/${WISHES.length}] ${wish.key} - ${text.substring(0, 20)}...`);
     }
     
-    // 创建间隔，模拟真实发布节奏
     if (i > 0 && i % 10 === 0) {
       await sleep(100);
     }
@@ -339,43 +259,33 @@ async function main(baseUrl) {
     return;
   }
   
-  // Step 2: 添加点赞和推荐
-  console.log('📊 Step 2: 添加点赞和推荐（幂律分布）...');
+  console.log('📊 Step 2: 添加点赞（幂律分布）...');
   console.log('─────────────────────────────────────────');
   
-  // 处理头部心愿
   console.log('\n🔥 头部心愿（高互动）:');
   for (const idx of HOT_INDICES) {
     const entry = createdWishes.find(e => e.index === idx);
     if (!entry) continue;
     
     const likes = randomInt(LIKE_RANGES.hot.min, LIKE_RANGES.hot.max);
-    const recs = randomInt(REC_RANGES.hot.min, REC_RANGES.hot.max);
-    
-    process.stdout.write(`\r   ⭐ [${idx + 1}] ${entry.wish.key}: ❤️${likes} 🌟${recs}...`);
+    process.stdout.write(`\r   ⭐ [${idx + 1}] ${entry.wish.key}: ${likes} 点赞...`);
     
     await addLikes(baseUrl, entry.wish.key, likes);
-    await addRecommends(baseUrl, entry.wish.key, recs);
     await sleep(100);
   }
   
-  // 处理肩部心愿
   console.log('\n\n Shoulder 心愿（中互动）:');
   for (const idx of WARM_INDICES) {
     const entry = createdWishes.find(e => e.index === idx);
     if (!entry) continue;
     
     const likes = randomInt(LIKE_RANGES.warm.min, LIKE_RANGES.warm.max);
-    const recs = randomInt(REC_RANGES.warm.min, REC_RANGES.warm.max);
-    
-    process.stdout.write(`\r   ✨ [${idx + 1}] ${entry.wish.key}: ❤️${likes} 🌟${recs}...`);
+    process.stdout.write(`\r   ✨ [${idx + 1}] ${entry.wish.key}: ${likes} 点赞...`);
     
     await addLikes(baseUrl, entry.wish.key, likes);
-    await addRecommends(baseUrl, entry.wish.key, recs);
     await sleep(80);
   }
   
-  // 处理躯干心愿
   console.log('\n\n📝 躯干心愿（正常互动）:');
   const bodyIndices = createdWishes
     .filter(e => !HOT_INDICES.includes(e.index) && !WARM_INDICES.includes(e.index) && e.index < 45)
@@ -386,17 +296,13 @@ async function main(baseUrl) {
     if (!entry) continue;
     
     const likes = randomInt(LIKE_RANGES.body.min, LIKE_RANGES.body.max);
-    const recs = randomInt(REC_RANGES.body.min, REC_RANGES.body.max);
-    
     await addLikes(baseUrl, entry.wish.key, likes);
-    await addRecommends(baseUrl, entry.wish.key, recs);
     
     if (idx % 5 === 0) {
       process.stdout.write(`\r   📄 已处理 ${bodyIndices.indexOf(idx) + 1}/${bodyIndices.length} 条...`);
     }
   }
   
-  // 处理尾部心愿
   console.log('\n\n🍃 尾部心愿（低互动）:');
   const tailIndices = createdWishes
     .filter(e => e.index >= 45)
@@ -407,19 +313,13 @@ async function main(baseUrl) {
     if (!entry) continue;
     
     const likes = randomInt(LIKE_RANGES.tail.min, LIKE_RANGES.tail.max);
-    const recs = randomInt(REC_RANGES.tail.min, REC_RANGES.tail.max);
-    
     await addLikes(baseUrl, entry.wish.key, likes);
-    if (recs > 0) {
-      await addRecommends(baseUrl, entry.wish.key, recs);
-    }
     
     if (idx % 10 === 0) {
       process.stdout.write(`\r   🌿 已处理 ${tailIndices.indexOf(idx) + 1}/${tailIndices.length} 条...`);
     }
   }
   
-  // 完成报告
   console.log('\n\n');
   console.log('╔════════════════════════════════════════════════════════════╗');
   console.log('║                    🎉 生成完成                              ║');
@@ -436,10 +336,6 @@ async function main(baseUrl) {
   console.log('   - "我也想写一个"');
   console.log('\n');
 }
-
-// ============================================================================
-// 命令行入口
-// ============================================================================
 
 function showHelp() {
   console.log('\n');
@@ -458,16 +354,8 @@ function showHelp() {
   console.log('  node scripts/seed-wishes.js http://localhost:8787    # 本地开发');
   console.log('  node scripts/seed-wishes.js --help                   # 显示帮助');
   console.log('\n');
-  console.log('设计理念:');
-  console.log('  不是祝福语录，是真实心声');
-  console.log('  - 脆弱感: 敢于暴露不安、焦虑、恐惧');
-  console.log('  - 具体场景: 有时间、地点、人物、细节');
-  console.log('  - 秘密愿望: 不敢对身边人说的心事');
-  console.log('  - 普通人视角: 不是大词，是小事');
-  console.log('\n');
 }
 
-// 解析命令行参数
 const args = process.argv.slice(2);
 
 if (args.includes('--help') || args.includes('-h')) {

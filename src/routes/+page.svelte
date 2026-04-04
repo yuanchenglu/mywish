@@ -6,24 +6,39 @@
   import { onMount } from 'svelte';
   import type { Wish, HourlyTopItem } from '../../workers/lib/kv-schema';
   
-  interface WishWithRank extends Wish {
+  interface WishWithRank extends Omit<HourlyTopItem, 'rank'> {
+    likes?: number;
+    rank?: '状元' | '榜眼' | '探花';
+  }
+  
+  interface WishWithRealtime extends Wish {
     realtime_likes?: number;
     realtime_likes_increment?: number;
-    rank?: '状元' | '榜眼' | '探花';
   }
   
   let activeTab = $state<TabType>('like');
   let wishes = $state<Wish[]>([]);
   let top3Wishes = $state<HourlyTopItem[]>([]);
   let loading = $state(true);
+  let loadingMore = $state(false);
+  let hasMore = $state(true);
+  let currentPage = $state(1);
+  let totalWishes = $state(0);
   let showPublishModal = $state(false);
   let showIntro = $state(false);
   
   const INTRO_SEEN_KEY = 'seen_wish_intro';
+  const PAGE_SIZE = 20;
+  const PRELOAD_THRESHOLD = 10;
   
-  onMount(async () => {
+  onMount(() => {
     checkFirstTimeIntro();
-    await loadTop3();
+    loadTop3();
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   });
   
   function checkFirstTimeIntro() {
@@ -59,14 +74,54 @@
   
   async function loadWishes() {
     loading = true;
+    currentPage = 1;
+    hasMore = true;
     try {
-      const res = await fetch('/api/wishes?limit=10&sort=time');
+      const res = await fetch(`/api/wishes?page=${currentPage}&limit=${PAGE_SIZE}`);
       const json = await res.json();
       wishes = json.data.wishes || [];
+      totalWishes = json.data.total || 0;
+      hasMore = wishes.length < totalWishes;
     } catch (e) {
       console.error('加载心愿列表失败', e);
     } finally {
       loading = false;
+    }
+  }
+  
+  async function loadMoreWishes() {
+    if (loadingMore || !hasMore) return;
+    
+    loadingMore = true;
+    try {
+      const nextPage = currentPage + 1;
+      const res = await fetch(`/api/wishes?page=${nextPage}&limit=${PAGE_SIZE}`);
+      const json = await res.json();
+      const newWishes = json.data.wishes || [];
+      
+      if (newWishes.length > 0) {
+        wishes = [...wishes, ...newWishes];
+        currentPage = nextPage;
+        hasMore = wishes.length < totalWishes;
+      } else {
+        hasMore = false;
+      }
+    } catch (e) {
+      console.error('加载更多失败', e);
+    } finally {
+      loadingMore = false;
+    }
+  }
+  
+  function handleScroll() {
+    if (activeTab !== 'square' || loading || loadingMore || !hasMore) return;
+    
+    const scrollPosition = window.innerHeight + window.scrollY;
+    const documentHeight = document.documentElement.scrollHeight;
+    const threshold = documentHeight * 0.3;
+    
+    if (scrollPosition >= documentHeight - threshold) {
+      loadMoreWishes();
     }
   }
   
@@ -86,17 +141,45 @@
   
   function handlePublishSuccess() {
     showPublishModal = false;
+    currentPage = 1;
+    hasMore = true;
     loadTop3();
     loadWishes();
   }
   
   async function handleLike(wish: Wish | HourlyTopItem) {
-    await fetch('/api/like', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wishKey: wish.key })
-    });
-    loadTop3();
+    try {
+      const res = await fetch('/api/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wishKey: wish.key })
+      });
+      const json = await res.json();
+      
+      if (json.success) {
+        // ✅ 只更新本地状态，不重新加载整个列表
+        if (activeTab === 'like' && 'likes_increment' in wish) {
+          // Top3 列表 - 只更新 likes_increment（虽然 API 没返回，但可以先不动）
+          const index = top3Wishes.findIndex(w => w.key === wish.key);
+          if (index !== -1) {
+            top3Wishes[index] = { 
+              ...top3Wishes[index]
+            };
+          }
+        } else if (activeTab === 'square') {
+          // 广场列表 - 更新 likes
+          const index = wishes.findIndex(w => w.key === wish.key);
+          if (index !== -1) {
+            wishes[index] = { 
+              ...wishes[index], 
+              likes: json.data.likes
+            };
+          }
+        }
+      }
+    } catch (e) {
+      console.error('点赞失败', e);
+    }
   }
   
   function handleShare(wish: Wish | HourlyTopItem) {
@@ -162,6 +245,12 @@
               onShare={() => handleShare(wish)}
             />
           {/each}
+          {#if loadingMore}
+            <div class="loading-more">加载更多...</div>
+          {/if}
+          {#if !hasMore && wishes.length > 0}
+            <div class="no-more">— 已经到底了 —</div>
+          {/if}
         {/if}
       </div>
     </section>
@@ -256,6 +345,23 @@
   .empty-state .hint {
     font-size: var(--font-size-sm);
     margin-top: var(--space-2);
+  }
+  
+  .loading-more,
+  .no-more {
+    text-align: center;
+    padding: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+  }
+  
+  .loading-more {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
   }
   
   @keyframes fadeIn {
