@@ -79,7 +79,7 @@
         setTimeout(() => likesAnimating = false, 500);
         
         if (cardElement) {
-          triggerLikeAnimation(cardElement);
+          triggerLikeAnimation(cardElement, { enableVoice: false });
           cardElement.classList.add('card-glow');
           const el = cardElement;
           setTimeout(() => el.classList.remove('card-glow'), 1000);
