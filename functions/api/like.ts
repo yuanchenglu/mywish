@@ -12,6 +12,7 @@ interface Env {
 interface LikeInput {
   wishId?: string;
   wishKey?: string;
+  count?: number;
 }
 
 export async function onRequest(context: EventContext<Env, string, unknown>): Promise<Response> {
@@ -48,19 +49,28 @@ export async function onRequest(context: EventContext<Env, string, unknown>): Pr
       wishId = mappedId;
     }
     
-    // 1. 更新总点赞数
-    const currentLikes = await env.KV.get(kvKey.likes(wishId!));
-    const currentCount = currentLikes ? parseInt(currentLikes, 10) : 0;
-    const newLikes = currentCount + 1;
-    await env.KV.put(kvKey.likes(wishId!), String(newLikes));
+    let newLikes: number;
+    let newHourLikes: number;
     
-    // 2. 更新每小时增量
-    const hourBucket = getCurrentHourBucket();
-    const hourLikesKey = kvKey.likesHour(hourBucket, wishId!);
-    const currentHourLikes = await env.KV.get(hourLikesKey);
-    const hourCount = currentHourLikes ? parseInt(currentHourLikes, 10) : 0;
-    const newHourLikes = hourCount + 1;
-    await env.KV.put(hourLikesKey, String(newHourLikes));
+    if (typeof body.count === 'number' && body.count >= 0) {
+      newLikes = body.count;
+      newHourLikes = body.count;
+      await env.KV.put(kvKey.likes(wishId!), String(newLikes));
+      const hourBucket = getCurrentHourBucket();
+      await env.KV.put(kvKey.likesHour(hourBucket, wishId!), String(newHourLikes));
+    } else {
+      const currentLikes = await env.KV.get(kvKey.likes(wishId!));
+      const currentCount = currentLikes ? parseInt(currentLikes, 10) : 0;
+      newLikes = currentCount + 1;
+      await env.KV.put(kvKey.likes(wishId!), String(newLikes));
+      
+      const hourBucket = getCurrentHourBucket();
+      const hourLikesKey = kvKey.likesHour(hourBucket, wishId!);
+      const currentHourLikes = await env.KV.get(hourLikesKey);
+      const hourCount = currentHourLikes ? parseInt(currentHourLikes, 10) : 0;
+      newHourLikes = hourCount + 1;
+      await env.KV.put(hourLikesKey, String(newHourLikes));
+    }
     
     return new Response(JSON.stringify({
       success: true,
