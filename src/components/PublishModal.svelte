@@ -14,6 +14,7 @@
     validateCustomKey,
     prepareWishInput 
   } from '$lib/WishCreator';
+  import WishReleaseAnimation from './WishReleaseAnimation.svelte';
   
   interface Props {
     onClose: () => void;
@@ -45,6 +46,11 @@
   
   // Modal动画状态
   let isVisible = $state(false);
+  
+  // [CRITICAL] 心愿发布动画状态
+  let modalElement: HTMLElement; // DOM 元素引用，不需要 $state
+  let wishReleaseAnimation: WishReleaseAnimation; // 组件实例引用，不需要 $state
+  let showReleaseAnimation = $state(false);
   
   // 进入动画
   $effect(() => {
@@ -83,19 +89,16 @@
       const json = await res.json();
       
       if (json.success) {
-        showToast = true;
-        toastMessage = '心愿发布成功！小钥匙：' + json.data?.key;
-        toastType = 'success';
+        // [CRITICAL] 触发心愿发布动画（替换原有 Toast 逻辑）
+        showReleaseAnimation = true;
         
-        // 成功后关闭Modal
-        setTimeout(() => {
-          handleClose();
-          onSuccess();
-        }, 1500);
-        
+        // 等待动画完成（3-4秒）
+        // 动画完成后会自动触发 onComplete 回调
         // 清空输入
         wishText = '';
         customKey = '';
+        
+        // 动画完成后的回调处理（在 handleAnimationComplete 中）
       } else {
         showToast = true;
         toastMessage = json.message || json.error || '发布失败，请重试';
@@ -112,6 +115,38 @@
     } finally {
       isSubmitting = false;
     }
+  }
+  
+  // [CRITICAL] 心愿发布动画完成回调
+  function handleAnimationComplete() {
+    showReleaseAnimation = false;
+    
+    // 显示成功 Toast
+    showToast = true;
+    toastMessage = '愿星辰大海守护你的心愿';
+    toastType = 'success';
+    
+    // 关闭 Modal 并刷新列表
+    setTimeout(() => {
+      handleClose();
+      onSuccess();
+    }, 500);
+  }
+  
+  // [CRITICAL] 心愿发布动画跳过回调
+  function handleAnimationSkip() {
+    showReleaseAnimation = false;
+    
+    // 显示简化 Toast
+    showToast = true;
+    toastMessage = '心愿已发布';
+    toastType = 'success';
+    
+    // 关闭 Modal 并刷新列表
+    setTimeout(() => {
+      handleClose();
+      onSuccess();
+    }, 300);
   }
   
   // 关闭Modal（带动画）
@@ -137,6 +172,7 @@
 <div 
   class="modal-backdrop"
   class:visible={isVisible}
+  bind:this={modalElement}
   onclick={handleBackdropClick}
   onkeydown={(e) => e.key === 'Escape' && handleClose()}
   role="dialog"
@@ -245,6 +281,16 @@
       </div>
     {/if}
   </div>
+  
+  <!-- [CRITICAL] 心愿发布动画组件 -->
+  {#if showReleaseAnimation && modalElement}
+    <WishReleaseAnimation 
+      bind:this={wishReleaseAnimation}
+      container={modalElement}
+      onComplete={handleAnimationComplete}
+      onSkip={handleAnimationSkip}
+    />
+  {/if}
 </div>
 
 <style>
