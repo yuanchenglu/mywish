@@ -1,6 +1,9 @@
 <script lang="ts">
   import WishCard from '../../../components/WishCard.svelte';
+  import BottomNav, { type TabType } from '../../../components/BottomNav.svelte';
+  import PublishModal from '../../../components/PublishModal.svelte';
   import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
   import type { Wish } from '../../../../workers/lib/kv-schema';
   import { isWechatBrowser, copyWishWithLink } from '../../../lib/ShareAction';
   
@@ -9,6 +12,7 @@
   let loading = $state(true);
   let showToast = $state(false);
   let toastMessage = $state('');
+  let showPublishModal = $state(false);
   
   $effect(() => {
     if (key) {
@@ -61,6 +65,27 @@
       navigator.clipboard.writeText(window.location.href);
     }
   }
+  
+  function handleTabChange(tab: TabType) {
+    if (tab === 'square') {
+      goto('/?tab=square');
+    } else if (tab === 'like') {
+      goto('/?tab=like');
+    }
+  }
+  
+  function handleTabRefresh(tab: TabType) {
+    handleTabChange(tab);
+  }
+  
+  function handlePublishClick() {
+    showPublishModal = true;
+  }
+  
+  function handlePublishSuccess() {
+    showPublishModal = false;
+    goto('/?tab=square');
+  }
 </script>
 
 <svelte:head>
@@ -68,7 +93,7 @@
   <meta name="description" content={wish?.text || '查看心愿详情'} />
 </svelte:head>
 
-<main>
+<main class="page-content">
   {#if loading}
     <p>加载中...</p>
   {:else if wish}
@@ -82,7 +107,30 @@
   {/if}
 </main>
 
+<BottomNav 
+  activeTab="square"
+  onTabChange={handleTabChange}
+  onTabRefresh={handleTabRefresh}
+  onPublishClick={handlePublishClick}
+/>
+
+{#if showPublishModal}
+  <PublishModal 
+    onClose={() => showPublishModal = false}
+    onSuccess={handlePublishSuccess}
+  />
+{/if}
+
 <style>
+  .page-content {
+    width: 100%;
+    min-height: calc(100vh - 64px);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
   .toast {
     position: fixed;
     bottom: 80px;
@@ -99,5 +147,18 @@
   @keyframes fadeIn {
     from { opacity: 0; transform: translateX(-50%) translateY(10px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  
+  @media (min-width: 768px) {
+    .page-content {
+      padding: var(--space-6);
+    }
+  }
+  
+  @media (min-width: 1025px) {
+    .page-content {
+      min-height: 100vh;
+      margin-left: 280px;
+    }
   }
 </style>
